@@ -1,0 +1,8 @@
+/dist
+/node_modules
+/inputs
+*.swp
+.DS_Store
+/.cache
+.env
+yarn.lock

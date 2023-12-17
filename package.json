@@ -1,0 +1,39 @@
+{
+  "name": "alpaca-tax",
+  "version": "0.0.1",
+  "description": "Alpaca Tax Calculator",
+  "author": "Artiom Baloian <artiom.baloian@gmail.com>",
+  "main": "dist/alpacatax.js",
+  "types": "dist/alpacatax.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "prepare": "npm run build",
+    "dev": "tsc && NODE_ENV=${NODE_ENV-development} node dist/test.js"
+  },
+  "engines": {
+    "node": ">=20.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/baloian/alpaca-tax.git"
+  },
+  "dependencies": {
+    "@baloian/lib": "github:baloian/lib",
+    "moment-timezone": "^0.5.43"
+  },
+  "devDependencies": {
+    "@types/msgpack5": "^3.4.3",
+    "@types/node": "^20.9.0",
+    "@types/readable-stream": "^4.0.2",
+    "@types/ws": "^8.5.5",
+    "@typescript-eslint/eslint-plugin": "^5.59.11",
+    "@typescript-eslint/parser": "^5.59.11",
+    "eslint": "^8.42.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "typescript": "^5.2.2"
+  }
+}
