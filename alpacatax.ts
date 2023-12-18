@@ -11,9 +11,16 @@ export class AlpacaTax {
       let fileData = await readJsonFile(`${dirPath}/${fileName}`);
       if (!fileData) throw new Error(`Failed to read ${fileName} file`);
       Validator.fileData(fileData);
-      // fileData = parseOrders(fileData);
-      // console.log(fileData);
+
+      fileData = parseOrders(fileData);
+      for (const trade of fileData.trade_activities) {
+        await AlpacaTax.processTrade(trade);
+      }
     }
+  }
+
+  static async processTrade(trade: any): Promise<void> {
+    console.log(trade);
   }
 }
 

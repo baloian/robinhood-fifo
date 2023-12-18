@@ -81,7 +81,5 @@ export default class Validator {
         trade_time: trade.trade_time
       });
     }
-
-    console.log(fileData);
   }
 }
