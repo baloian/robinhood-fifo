@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isValidDateString } from './utils';
 
 export default class Validator {
   static fileNames(fileNames: string[]): void {
@@ -27,5 +28,60 @@ export default class Validator {
         day: Number(name.substring(6, 9))
       });
     }
+  }
+
+  static fileData(fileData: any): void {
+    const tradeActivitiesSchema = z.object({
+      symbol: z.string().min(1),
+      side: z.string().refine((val) => val === 'buy' || val === 'sell', {
+        message: 'The trade side must be `buy` or `sell`',
+      }),
+      qty: z.string().refine((val) => !isNaN(parseFloat(val)), {
+        message: 'Invalid number format',
+      }),
+      price: z.string().refine((val) => !isNaN(parseFloat(val)), {
+        message: 'Invalid number format',
+      }),
+      gross_amount: z.string().refine((val) => !isNaN(parseFloat(val)), {
+        message: 'Invalid number format',
+      }),
+      /*
+      fees: [],
+      net_amount: '2379.93',
+      */
+      trade_date: z.string().refine((val) => isValidDateString(val, 'YYYY-MM-DD'), {
+        message: 'Invalid trade date format',
+      }),
+      trade_time: z.string().refine((val) => isValidDateString(val, 'HH:mm:ss.SSS'), {
+        message: 'Invalid trade time format',
+      }),
+      /*
+      settle_date: '2023-12-14',
+      asset_type: 'E',
+      note: '',
+      */
+      status: z.string().refine((val) => val === 'executed', {
+        message: 'The trade status must be executed',
+      }),
+      /*
+      capacity: 'agency',
+      execution_id: '20315094015'
+      */
+    });
+
+    for (const trade of fileData.trade_activities) {
+      tradeActivitiesSchema.parse({
+        symbol: trade.symbol,
+        side: trade.side,
+        qty: trade.qty,
+        price: trade.price,
+        gross_amount: trade.gross_amount,
+        status: trade.status,
+        trade_date: trade.trade_date,
+        trade_time: trade.trade_time
+      });
+    }
+
+    console.log(fileData);
   }
 }

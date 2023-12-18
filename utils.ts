@@ -37,3 +37,9 @@ export function parseOrders(fileData: any): Promise<any> {
   fileData.trade_activities = fileData.trade_activities.sort((a: any, b: any) => a.trade_time_ms - b.trade_time_ms);
   return fileData;
 }
+
+
+export function isValidDateString(value: string, format: string): boolean {
+  const date = moment(value, format);
+  return date.isValid();
+}
