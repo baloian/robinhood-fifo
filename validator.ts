@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 export default class Validator {
   static fileNames(fileNames: string[]): void {
+    if (!fileNames.length) return;
+
     const invalidFileFormat: string = 'Invalid filename format. It must be YYYYMMDD.json';
     const yearErrorMsg = {message: `${invalidFileFormat}. Failed 2014 <= YYYY <= 2100 validation`};
     const monthErrorMsg = {message: `${invalidFileFormat}. Failed 1 <= MM <= 12 validation`};
