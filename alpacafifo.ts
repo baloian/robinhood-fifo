@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import Validator from './validator';
 import Queue from './queue';
 import { AlpacaTradTy } from './types';
@@ -20,7 +21,7 @@ let gData: StringListTy[] = [];
 
 
 export class AlpacaFIFO {
-  public static async run(dirPath: string): Promise<void> {
+  public static async run(dirPath: string = String(process.env.INPUTS)): Promise<void> {
     const fileNames = await getListOfFilenames(dirPath);
     Validator.fileNames(fileNames);
 

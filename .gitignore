@@ -1,6 +1,9 @@
 /dist
 /node_modules
 /inputs
+/outputs
+/INPUTS
+/OUTPUTS
 *.swp
 .DS_Store
 /.cache

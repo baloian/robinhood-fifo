@@ -2,7 +2,6 @@ import moment from 'moment-timezone';
 import { round, timeDiff } from '@baloian/lib';
 import { AlpacaTradTy } from './types';
 import { promises as fs } from 'fs';
-import { number } from 'zod';
 
 
 export async function getListOfFilenames(dirPath: string): Promise<string[]> {
@@ -74,7 +73,7 @@ export function getTradeRecord(buyTrade: AlpacaTradTy, sellTrade: AlpacaTradTy):
 
 
 export async function writeCsvFile(data: any[], currentYear: number) {
-  const filePath: string = `alpaca-fifo-${currentYear}.csv`;
+  const filePath: string = `${process.env.OUTPUTS}/alpaca-fifo-${currentYear}.csv`;
   data.unshift(
     [
       'Symbol',
