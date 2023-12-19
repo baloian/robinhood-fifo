@@ -20,8 +20,10 @@ let gData: StringListTy[] = [];
 
 
 export class AlpacaFIFO {
-  public static async run(inputDirPath: string = String(process.env.INPUTS),
-                          outputDirPath: string = String(process.env.OUTPUTS)): Promise<void> {
+  public static async run(
+    inputDirPath: string = String(process.env.INPUTS),
+    outputDirPath: string = String(process.env.OUTPUTS)
+  ): Promise<void> {
     const fileNames = await getListOfFilenames(inputDirPath);
     if (!fileNames.length) throw new Error('Please provide files. No YYYYMMDD.json files to process');
 
@@ -41,7 +43,6 @@ export class AlpacaFIFO {
         gData = [];
       }
     }
-    console.log(gData);
     await writeCsvFile(gData, currentYear, outputDirPath);
   }
 
@@ -64,7 +65,7 @@ export class AlpacaFIFO {
       buyTrade.qty -= sellTrade.qty;
       symbolQueue.updateFront(buyTrade);
       gData.push(getTradeRecord(buyTrade, sellTrade));
-    } else  {
+    } else {
       // This is when selling more than the current but order.
       // For example, buying 5 APPL, and then buying 4 more APPL, and then selling 7 APPL.
       // In this case, the current buying order is the 5 AAPL. I would need to sell 2 more
