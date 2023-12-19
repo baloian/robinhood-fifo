@@ -48,12 +48,8 @@ export class AlpacaTax {
   }
 
   private static processBuyTrade(trade: AlpacaTradTy): void {
-    if (gQueue[trade.symbol]) {
-      gQueue[trade.symbol].push({...trade});
-    } else {
-      gQueue[trade.symbol] = new Queue<AlpacaTradTy>();
-      gQueue[trade.symbol].push({...trade});
-    }
+    if (!gQueue[trade.symbol]) gQueue[trade.symbol] = new Queue<AlpacaTradTy>();
+    gQueue[trade.symbol].push({...trade});
   }
 
   private static processSellTrade(sellTrade: AlpacaTradTy): void {
