@@ -31,6 +31,8 @@ export default class Validator {
   }
 
   static fileData(fileData: any): void {
+    if (!fileData) throw new Error(`Failed to read JSON file`);
+
     const tradeActivitiesSchema = z.object({
       symbol: z.string().min(1),
       side: z.string().refine((val) => val === 'buy' || val === 'sell', {

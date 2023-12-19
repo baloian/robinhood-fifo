@@ -9,7 +9,6 @@ export class AlpacaTax {
 
     for (const fileName of fileNames) {
       let fileData = await readJsonFile(`${dirPath}/${fileName}`);
-      if (!fileData) throw new Error(`Failed to read ${fileName} file`);
       Validator.fileData(fileData);
 
       fileData = parseOrders(fileData);
