@@ -1,4 +1,5 @@
 import Validator from './validator';
+import { AlpacaTradTy } from './types';
 import { getListOfFilenames, readJsonFile, parseOrders } from './utils';
 
 
@@ -18,7 +19,7 @@ export class AlpacaTax {
     }
   }
 
-  static async processTrade(trade: any): Promise<void> {
+  static async processTrade(trade: AlpacaTradTy): Promise<void> {
     console.log(trade);
   }
 }
