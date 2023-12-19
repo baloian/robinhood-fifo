@@ -5,7 +5,7 @@ import { getListOfFilenames, readJsonFile, parseOrders } from './utils';
 
 
 // This is a global variable where I keep orders for every symbol in a queue.
-const gData: {[key: string]: any} = {};
+const gQueue: {[key: string]: any} = {};
 
 
 export class AlpacaTax {
@@ -19,25 +19,26 @@ export class AlpacaTax {
 
       fileData = parseOrders(fileData);
       for (const trade of fileData.trade_activities) {
-        if (trade.side === 'buy') {
-          AlpacaTax.processBuyTrade(trade);
-        } else if (trade.side === 'sell') {
-          // TODO
-        } else {
-          throw new Error(`The order with ${trade.side} side is not supported`);
-        }
+        if (trade.side === 'buy') AlpacaTax.processBuyTrade(trade);
+        else AlpacaTax.processSellTrade(trade);
       }
     }
-    // console.log(gData['SHOP']);
+    console.log(gQueue);
   }
 
   private static processBuyTrade(trade: AlpacaTradTy): void {
-      if (gData[trade.symbol]) {
-        gData[trade.symbol].push({...trade});
+      if (gQueue[trade.symbol]) {
+        gQueue[trade.symbol].push({...trade});
       } else {
-        gData[trade.symbol] = new Queue<AlpacaTradTy>();
-        gData[trade.symbol].push({...trade});
+        gQueue[trade.symbol] = new Queue<AlpacaTradTy>();
+        gQueue[trade.symbol].push({...trade});
       }
+  }
+
+  private static processSellTrade(trade: AlpacaTradTy): void {
+    if (!gQueue[trade.symbol]) throw new Error(`Failed to process sell for ${trade.symbol}`);
+    const data = gQueue[trade.symbol].front();
+    if (data.qty + trade.qty === 0) gQueue[trade.symbol].pop();
   }
 }
 
