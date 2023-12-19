@@ -6,7 +6,8 @@ import {
   readJsonFile,
   parseOrders,
   getTradeRecord,
-  writeCsvFile
+  writeCsvFile,
+  getYearFromFile
 } from './utils';
 
 
@@ -15,7 +16,7 @@ const gQueue: {[key: string]: any} = {};
 
 
 type StringListTy = string[];
-const gData: StringListTy[] = [];
+let gData: StringListTy[] = [];
 
 
 export class AlpacaTax {
@@ -23,6 +24,7 @@ export class AlpacaTax {
     const fileNames = await getListOfFilenames(dirPath);
     Validator.fileNames(fileNames);
 
+    let currentYear: number = fileNames.length ? getYearFromFile(fileNames[0]) : 0;
     for (const fileName of fileNames) {
       let fileData = await readJsonFile(`${dirPath}/${fileName}`);
       Validator.fileData(fileData);
@@ -32,9 +34,17 @@ export class AlpacaTax {
         if (trade.side === 'buy') AlpacaTax.processBuyTrade(trade);
         else AlpacaTax.processSellTrade(trade);
       }
+
+      // I do this because I create a separate <year>.csv file for each year.
+      const tmpYear: number = getYearFromFile(fileName);
+      if (currentYear !== tmpYear) {
+        await writeCsvFile(gData, currentYear);
+        currentYear = tmpYear;
+        gData = [];
+      }
     }
     console.log(gData);
-    await writeCsvFile(gData, 'example.csv');
+    await writeCsvFile(gData, currentYear);
   }
 
   private static processBuyTrade(trade: AlpacaTradTy): void {
@@ -52,6 +62,8 @@ export class AlpacaTax {
     if (buyTrade.qty + sellTrade.qty === 0) {
       gData.push(getTradeRecord(buyTrade, sellTrade));
       gQueue[sellTrade.symbol].pop();
+    } else {
+      // TODO
     }
   }
 }

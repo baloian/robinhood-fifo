@@ -2,6 +2,7 @@ import moment from 'moment-timezone';
 import { round, timeDiff } from '@baloian/lib';
 import { AlpacaTradTy } from './types';
 import { promises as fs } from 'fs';
+import { number } from 'zod';
 
 
 export async function getListOfFilenames(dirPath: string): Promise<string[]> {
@@ -72,7 +73,8 @@ export function getTradeRecord(buyTrade: AlpacaTradTy, sellTrade: AlpacaTradTy):
 }
 
 
-export async function writeCsvFile(data: any[], filePath: string) {
+export async function writeCsvFile(data: any[], currentYear: number) {
+  const filePath: string = `alpaca-tax-${currentYear}.csv`;
   data.unshift(
     [
       'Symbol',
@@ -87,4 +89,9 @@ export async function writeCsvFile(data: any[], filePath: string) {
   );
   const csvContent = data.map(row => row.join(',')).join('\n');
   await fs.writeFile(filePath, csvContent, 'utf-8');
+}
+
+
+export function getYearFromFile(filename: string): number {
+  return Number(filename.substring(0, 4));
 }
