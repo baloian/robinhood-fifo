@@ -61,6 +61,7 @@ export class AlpacaFIFO {
       // In this case, I should keep the order in the queue but decrease only the quantity.
       buyTrade.qty -= sellTrade.qty;
       gQueue[sellTrade.symbol].updateFront(buyTrade);
+      gData.push(getTradeRecord(buyTrade, sellTrade));
     } else  {
       // This is when selling more than the current but order.
       // For example, buying 5 APPL, and then buying 4 more APPL, and then selling 7 APPL.
