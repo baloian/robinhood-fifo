@@ -13,6 +13,9 @@ You need to set up environment variables by creating a `.env` file in the root d
 INPUTS=<input files absolute path>
 OUTPUTS=<output absolute path>
 ```
+Download all the Alpaca YYYYMMDD.json files from your account documents and place them in the `INPUT` folder. Please do not edit
+the files or their contents. Otherwise, the result will be incorrect.
+
 
 ## Usage
 Create an `inputs` directory in the root directory and upload all the `<YYYYMMDD>.json` files without any modifications.
