@@ -24,5 +24,9 @@ export default class Queue<T> {
   clear(): void {
     this.items = [];
   }
+
+  updateFront(data: T): void {
+    this.items[0] = JSON.parse(JSON.stringify(data));
+  }
 }
 
