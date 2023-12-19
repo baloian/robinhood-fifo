@@ -32,9 +32,9 @@ export function parseOrders(fileData: any): Promise<any> {
     const mt = moment(`${e.trade_date} ${e.trade_time}`, 'YYYY-MM-DD HH:mm:ss.SSS');
     const nyTime = moment.tz(mt, 'America/New_York');
     e.trade_time_ms = Number(nyTime.format('x'));
-    e.qty = Number(e.qty);
+    e.qty = Math.abs(e.qty);
     e.price = Number(e.price);
-    e.gross_amount = Number(e.gross_amount);
+    e.gross_amount = Math.abs(e.gross_amount);
   });
   fileData.trade_activities = fileData.trade_activities.sort((a: any, b: any) => a.trade_time_ms - b.trade_time_ms);
   return fileData;

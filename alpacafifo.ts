@@ -56,7 +56,7 @@ export class AlpacaFIFO {
   private static processSellTrade(sellTrade: AlpacaTradTy): void {
     if (!gQueue[sellTrade.symbol]) throw new Error(`Failed to process sell for ${sellTrade.symbol}`);
     const buyTrade: AlpacaTradTy = gQueue[sellTrade.symbol].front();
-    if (buyTrade.qty + sellTrade.qty === 0) {
+    if (buyTrade.qty - sellTrade.qty === 0) {
       gData.push(getTradeRecord(buyTrade, sellTrade));
       gQueue[sellTrade.symbol].pop();
     } else {
