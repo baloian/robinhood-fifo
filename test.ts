@@ -1,5 +1,5 @@
 import { abort } from '@baloian/lib';
-import { AlpacaTax } from './alpacatax';
+import { AlpacaFIFO } from './alpacafifo';
 
 
 /**
@@ -7,5 +7,5 @@ import { AlpacaTax } from './alpacatax';
  */
 (async () => {
   const dirPath = 'inputs';
-  await AlpacaTax.calculate(dirPath);
+  await AlpacaFIFO.run(dirPath);
 })().catch(abort);

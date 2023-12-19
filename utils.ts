@@ -74,7 +74,7 @@ export function getTradeRecord(buyTrade: AlpacaTradTy, sellTrade: AlpacaTradTy):
 
 
 export async function writeCsvFile(data: any[], currentYear: number) {
-  const filePath: string = `alpaca-tax-${currentYear}.csv`;
+  const filePath: string = `alpaca-fifo-${currentYear}.csv`;
   data.unshift(
     [
       'Symbol',

@@ -4,16 +4,16 @@ reports as inputs. We do this because Alpaca no longer supports FIFO.
 
 ## Install
 ```bash
-npm install github:baloian/alpaca-tax
+npm install github:baloian/alpaca-fifo
 ```
 
 ## Usage
 Create an `inputs` directory in the root directory and upload all the `<YYYYMMDD>.json` files without any modifications.
 ```typescript
-import { AlpacaTax } from 'alpaca-tax';
+import { AlpacaFIFO } from 'alpaca-fifo';
 
 (async () => {
-  await AlpacaTax.calculate();
+  await AlpacaFIFO.run();
 })();
 ```
 

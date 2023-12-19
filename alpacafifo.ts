@@ -19,8 +19,8 @@ type StringListTy = string[];
 let gData: StringListTy[] = [];
 
 
-export class AlpacaTax {
-  public static async calculate(dirPath: string): Promise<void> {
+export class AlpacaFIFO {
+  public static async run(dirPath: string): Promise<void> {
     const fileNames = await getListOfFilenames(dirPath);
     Validator.fileNames(fileNames);
 
@@ -31,8 +31,8 @@ export class AlpacaTax {
 
       fileData = parseOrders(fileData);
       for (const trade of fileData.trade_activities) {
-        if (trade.side === 'buy') AlpacaTax.processBuyTrade(trade);
-        else AlpacaTax.processSellTrade(trade);
+        if (trade.side === 'buy') AlpacaFIFO.processBuyTrade(trade);
+        else AlpacaFIFO.processSellTrade(trade);
       }
 
       // I do this because I create a separate <year>.csv file for each year.
