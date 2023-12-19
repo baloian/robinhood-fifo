@@ -65,8 +65,8 @@ export function getTradeRecord(buyTrade: AlpacaTradTy, sellTrade: AlpacaTradTy):
 }
 
 
-export async function writeCsvFile(data: any[], currentYear: number) {
-  const filePath: string = `${process.env.OUTPUTS}/alpaca-fifo-${currentYear}.csv`;
+export async function writeCsvFile(data: any[], currentYear: number, outputDirPath: string) {
+  const filePath: string = `${outputDirPath}/alpaca-fifo-${currentYear}.csv`;
   data.unshift(
     [
       'Symbol',
