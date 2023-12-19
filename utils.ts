@@ -64,7 +64,7 @@ export function getTradeRecord(buyTrade: AlpacaTradTy, sellTrade: AlpacaTradTy):
     `${buyTrade.qty}`,
     `${buyTrade.trade_date}T${buyTrade.trade_time}`,
     `${sellTrade.trade_date}T${sellTrade.trade_time}`,
-    `${timeDiff(buyTrade.trade_time_ms, sellTrade.trade_time_ms)}`,
+    timeDiff(buyTrade.trade_time_ms, sellTrade.trade_time_ms),
     `${buyTrade.gross_amount}`,
     `${Math.abs(sellTrade.gross_amount)}`,
     `${round((Math.abs(sellTrade.gross_amount) - Math.abs(buyTrade.gross_amount)))}`
