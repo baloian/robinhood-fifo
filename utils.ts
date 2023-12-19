@@ -1,13 +1,13 @@
 import moment from 'moment-timezone';
 import { round, timeDiff } from '@baloian/lib';
 import { AlpacaTradTy } from './types';
-import { readFile, readdir } from 'fs/promises';
+import { promises as fs } from 'fs';
 
 
 export async function getListOfFilenames(dirPath: string): Promise<string[]> {
   let fileNames: string[] = [];
   try {
-    fileNames = await readdir(dirPath);
+    fileNames = await fs.readdir(dirPath);
   } catch (err) {
     console.error('Error reading files names:', err);
   }
@@ -17,7 +17,7 @@ export async function getListOfFilenames(dirPath: string): Promise<string[]> {
 
 export async function readJsonFile(filePath: string): Promise<any> {
   try {
-    const fileData = await readFile(filePath, 'utf-8');
+    const fileData = await fs.readFile(filePath, 'utf-8');
     const jsonData = JSON.parse(fileData);
     return jsonData;
   } catch (error) {
@@ -69,4 +69,10 @@ export function getTradeRecord(buyTrade: AlpacaTradTy, sellTrade: AlpacaTradTy):
     `${Math.abs(sellTrade.gross_amount)}`,
     `${round((Math.abs(sellTrade.gross_amount) - Math.abs(buyTrade.gross_amount)))}`
   ];
+}
+
+
+export async function writeCsvFile(data: any[], filePath: string) {
+  const csvContent = data.map(row => row.join(',')).join('\n');
+  await fs.writeFile(filePath, csvContent, 'utf-8');
 }

@@ -1,7 +1,13 @@
 import Validator from './validator';
 import Queue from './queue';
 import { AlpacaTradTy } from './types';
-import { getListOfFilenames, readJsonFile, parseOrders, getTradeRecord } from './utils';
+import {
+  getListOfFilenames,
+  readJsonFile,
+  parseOrders,
+  getTradeRecord,
+  writeCsvFile
+} from './utils';
 
 
 // This is a global variable where I keep orders for every symbol in a queue.
@@ -15,7 +21,7 @@ const gData: StringListTy[] = [
     'Quantity',
     'Date Acquired',
     'Date Sold',
-    'Holding Time',
+    'Holding Time (~)',
     'Acquired Cost',
     'Sold Gross Amount',
     'Gain or Loss'
@@ -40,6 +46,7 @@ export class AlpacaTax {
       }
     }
     console.log(gData);
+    await writeCsvFile(gData, 'example.csv');
   }
 
   private static processBuyTrade(trade: AlpacaTradTy): void {
