@@ -1,10 +1,11 @@
 import Validator from './validator';
+import Queue from './queue';
 import { AlpacaTradTy } from './types';
 import { getListOfFilenames, readJsonFile, parseOrders } from './utils';
 
 
 // This is a global variable where I keep orders for every symbol in a queue.
-const gData: {[key: string]: any[]} = {};
+const gData: {[key: string]: any} = {};
 
 
 export class AlpacaTax {
@@ -18,19 +19,25 @@ export class AlpacaTax {
 
       fileData = parseOrders(fileData);
       for (const trade of fileData.trade_activities) {
-        await AlpacaTax.processTrade(trade);
+        if (trade.side === 'buy') {
+          AlpacaTax.processBuyTrade(trade);
+        } else if (trade.side === 'sell') {
+          // TODO
+        } else {
+          throw new Error(`The order with ${trade.side} side is not supported`);
+        }
       }
     }
+    // console.log(gData['SHOP']);
   }
 
-  private static async processTrade(trade: AlpacaTradTy): Promise<void> {
-    if (trade.side === 'buy') {
-      // TODO
-    } else if (trade.side === 'sell') {
-      // TODO
-    } else {
-      throw new Error(`The order with ${trade.side} side is not supported`);
-    }
+  private static processBuyTrade(trade: AlpacaTradTy): void {
+      if (gData[trade.symbol]) {
+        gData[trade.symbol].push({...trade});
+      } else {
+        gData[trade.symbol] = new Queue<AlpacaTradTy>();
+        gData[trade.symbol].push({...trade});
+      }
   }
 }
 
