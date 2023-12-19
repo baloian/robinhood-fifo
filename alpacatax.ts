@@ -15,6 +15,7 @@ const gData: StringListTy[] = [
     'Quantity',
     'Date Acquired',
     'Date Sold',
+    'Holding Time',
     'Acquired Cost',
     'Sold Gross Amount',
     'Gain or Loss'

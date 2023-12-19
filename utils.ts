@@ -1,4 +1,5 @@
 import moment from 'moment-timezone';
+import { round, timeDiff } from '@baloian/lib';
 import { AlpacaTradTy } from './types';
 import { readFile, readdir } from 'fs/promises';
 
@@ -47,15 +48,25 @@ export function isValidDateString(value: string, format: string): boolean {
 
 
 // The format is as follow:
-// ['Symbol', 'Quantity', 'Date Acquired', 'Date Sold', 'Acquired Cost', 'Sold Gross Amount', 'Gain or Loss']
+// [
+//   'Symbol',
+//   'Quantity',
+//   'Date Acquired',
+//   'Date Sold',
+//   'Holding Time',
+//   'Acquired Cost',
+//   'Sold Gross Amount',
+//   'Gain or Loss'
+// ]
 export function getTradeRecord(buyTrade: AlpacaTradTy, sellTrade: AlpacaTradTy): string[] {
   return [
     buyTrade.symbol,
     `${buyTrade.qty}`,
     `${buyTrade.trade_date}T${buyTrade.trade_time}`,
     `${sellTrade.trade_date}T${sellTrade.trade_time}`,
+    `${timeDiff(buyTrade.trade_time_ms, sellTrade.trade_time_ms)}`,
     `${buyTrade.gross_amount}`,
     `${Math.abs(sellTrade.gross_amount)}`,
-    `${((Math.abs(sellTrade.gross_amount) - Math.abs(buyTrade.gross_amount))).toFixed(2)}`
+    `${round((Math.abs(sellTrade.gross_amount) - Math.abs(buyTrade.gross_amount)))}`
   ];
 }
