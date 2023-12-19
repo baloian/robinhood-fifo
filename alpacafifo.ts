@@ -23,14 +23,11 @@ let gData: StringListTy[] = [];
 export class AlpacaFIFO {
   public static async run(dirPath: string = String(process.env.INPUTS)): Promise<void> {
     const fileNames = await getListOfFilenames(dirPath);
-    Validator.fileNames(fileNames);
+    if (!fileNames.length) throw new Error('Please provide files. No YYYYMMDD.json files to process');
 
-    let currentYear: number = fileNames.length ? getYearFromFile(fileNames[0]) : 0;
+    let currentYear: number = getYearFromFile(fileNames[0]);
     for (const fileName of fileNames) {
-      let fileData = await readJsonFile(`${dirPath}/${fileName}`);
-      Validator.fileData(fileData);
-
-      fileData = parseOrders(fileData);
+      const fileData = await readJsonFile(`${dirPath}/${fileName}`);
       for (const trade of fileData.trade_activities) {
         if (trade.side === 'buy') AlpacaFIFO.processBuyTrade(trade);
         else AlpacaFIFO.processSellTrade(trade);

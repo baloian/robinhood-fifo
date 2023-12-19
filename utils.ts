@@ -1,29 +1,22 @@
 import moment from 'moment-timezone';
 import { round, timeDiff } from '@baloian/lib';
+import Validator from './validator';
 import { AlpacaTradTy } from './types';
 import { promises as fs } from 'fs';
 
 
 export async function getListOfFilenames(dirPath: string): Promise<string[]> {
-  let fileNames: string[] = [];
-  try {
-    fileNames = await fs.readdir(dirPath);
-  } catch (err) {
-    console.error('Error reading files names:', err);
-  }
+  const fileNames: string[] = await fs.readdir(dirPath);
+  Validator.fileNames(fileNames);
   return fileNames.sort();
 }
 
 
 export async function readJsonFile(filePath: string): Promise<any> {
-  try {
-    const fileData = await fs.readFile(filePath, 'utf-8');
-    const jsonData = JSON.parse(fileData);
-    return jsonData;
-  } catch (error) {
-    console.error(error);
-  }
-  return null;
+  const fileData = await fs.readFile(filePath, 'utf-8');
+  const jsonData = JSON.parse(fileData);
+  Validator.fileData(jsonData);
+  return parseOrders(jsonData);
 }
 
 
