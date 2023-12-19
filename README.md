@@ -1,5 +1,5 @@
-# Alpaca Tax Calculator
-This is a TypeScript library that provides functionality to calculate Alpaca trading tax based on FIFO using Alpaca `<YYYYMMDD>.json`
+# Alpaca FIFO
+This is a TypeScript library that provides functionality to calculate Alpaca trading gain or loss based on FIFO using Alpaca `<YYYYMMDD>.json`
 reports as inputs. We do this because Alpaca no longer supports FIFO.
 
 ## Install
@@ -13,7 +13,7 @@ You need to set up environment variables by creating a `.env` file in the root d
 INPUTS=<input files absolute path>
 OUTPUTS=<output absolute path>
 ```
-Download all the Alpaca YYYYMMDD.json files from your account documents and place them in the `INPUT` folder. Please do not edit
+Download all the Alpaca `<YYYYMMDD>.json` files from your account documents and place them in the `INPUTS` folder. Please do not edit
 the files or their contents. Otherwise, the result will be incorrect.
 
 
