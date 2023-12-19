@@ -7,6 +7,13 @@ reports as inputs. We do this because Alpaca no longer supports FIFO.
 npm install github:baloian/alpaca-fifo
 ```
 
+## Setup
+You need to set up environment variables by creating a `.env` file in the root directory and providing the following variables:
+```bash
+INPUTS=<input files absolute path>
+OUTPUTS=<output absolute path>
+```
+
 ## Usage
 Create an `inputs` directory in the root directory and upload all the `<YYYYMMDD>.json` files without any modifications.
 ```typescript
