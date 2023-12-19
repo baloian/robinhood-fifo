@@ -15,18 +15,7 @@ const gQueue: {[key: string]: any} = {};
 
 
 type StringListTy = string[];
-const gData: StringListTy[] = [
-  [
-    'Symbol',
-    'Quantity',
-    'Date Acquired',
-    'Date Sold',
-    'Holding Time (~)',
-    'Acquired Cost',
-    'Sold Gross Amount',
-    'Gain or Loss'
-  ]
-];
+const gData: StringListTy[] = [];
 
 
 export class AlpacaTax {

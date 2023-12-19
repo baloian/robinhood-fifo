@@ -73,6 +73,18 @@ export function getTradeRecord(buyTrade: AlpacaTradTy, sellTrade: AlpacaTradTy):
 
 
 export async function writeCsvFile(data: any[], filePath: string) {
+  data.unshift(
+    [
+      'Symbol',
+      'Quantity',
+      'Date Acquired',
+      'Date Sold',
+      'Holding Time (~)',
+      'Acquired Cost',
+      'Sold Gross Amount',
+      'Gain or Loss'
+    ]
+  );
   const csvContent = data.map(row => row.join(',')).join('\n');
   await fs.writeFile(filePath, csvContent, 'utf-8');
 }
