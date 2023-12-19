@@ -1,11 +1,26 @@
 import Validator from './validator';
 import Queue from './queue';
 import { AlpacaTradTy } from './types';
-import { getListOfFilenames, readJsonFile, parseOrders } from './utils';
+import { getListOfFilenames, readJsonFile, parseOrders, getTradeRecord } from './utils';
 
 
 // This is a global variable where I keep orders for every symbol in a queue.
 const gQueue: {[key: string]: any} = {};
+
+
+type StringListTy = string[];
+const gData: StringListTy[] = [
+  [
+    'Symbol',
+    'Quantity',
+    'Date Acquired',
+    'Date Sold',
+    'Acquired Cost',
+    'Sold Gross Amount',
+    'Gain or Loss'
+  ]
+];
+
 
 
 export class AlpacaTax {
@@ -23,7 +38,7 @@ export class AlpacaTax {
         else AlpacaTax.processSellTrade(trade);
       }
     }
-    console.log(gQueue);
+    console.log(gData);
   }
 
   private static processBuyTrade(trade: AlpacaTradTy): void {
@@ -35,10 +50,13 @@ export class AlpacaTax {
       }
   }
 
-  private static processSellTrade(trade: AlpacaTradTy): void {
-    if (!gQueue[trade.symbol]) throw new Error(`Failed to process sell for ${trade.symbol}`);
-    const data = gQueue[trade.symbol].front();
-    if (data.qty + trade.qty === 0) gQueue[trade.symbol].pop();
+  private static processSellTrade(sellTrade: AlpacaTradTy): void {
+    if (!gQueue[sellTrade.symbol]) throw new Error(`Failed to process sell for ${sellTrade.symbol}`);
+    const buyTrade: AlpacaTradTy = gQueue[sellTrade.symbol].front();
+    if (buyTrade.qty + sellTrade.qty === 0) {
+      gData.push(getTradeRecord(buyTrade, sellTrade));
+      gQueue[sellTrade.symbol].pop();
+    }
   }
 }
 
