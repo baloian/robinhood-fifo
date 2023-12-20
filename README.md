@@ -41,7 +41,7 @@ If running the project went successfully, then in the `OUTPUTS` directory, you s
 and `alpaca-fees-<YYYY>.csv` files for each year. 
 
 
-## Use as a Dependency library
+## Use as a Dependency Library
 You can use the project asa  dependency lib of your project.
 
 #### Install
