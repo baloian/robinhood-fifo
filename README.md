@@ -19,8 +19,8 @@ npm install
 Create two directories, one for input (e.g. `INPUTS`) and the other for outputs (e.g. `OUTPUTS`).
 
 #### STEP 2:
-Download all the Alpaca `<YYYYMMDD>.json` files from your account documents and place them in the `INPUTS` folder. Please do not edit
-the filenames or their contents. Otherwise, the result will be incorrect.
+Download all the Alpaca `<YYYYMMDD>.json` files from your account documents and place them in the `INPUTS` folder.
+Please do not edit the filenames or their contents. Otherwise, the result will be incorrect.
 
 
 #### STEP 3:
@@ -36,8 +36,9 @@ In the root directory, execute the following command
 npm run start
 ```
 
-## Results
-In the `OUTPUTS` directory, you should see `alpaca-fifo-<YYYY>.csv` and `alpaca-fees-<YYYY>.csv` files for each year. 
+## Output Results
+If running the project went successfully, then in the `OUTPUTS` directory, you should see `alpaca-fifo-<YYYY>.csv`
+and `alpaca-fees-<YYYY>.csv` files for each year. 
 
 
 ## Use as a Dependency library
