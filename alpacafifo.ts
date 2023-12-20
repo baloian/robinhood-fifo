@@ -26,9 +26,8 @@ export class AlpacaFIFO {
   ): Promise<void> {
     AlpacaFIFO.reset();
     const fileNames = await getListOfFilenames(inputDirPath);
-    if (!fileNames.length) throw new Error('Please provide files. No YYYYMMDD.json files to process');
-
     let currentYear: number = getYearFromFile(fileNames[0]);
+
     for (const fileName of fileNames) {
       const fileData = await readJsonFile(`${inputDirPath}/${fileName}`);
       for (const trade of fileData.trade_activities) {

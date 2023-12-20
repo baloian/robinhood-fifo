@@ -7,6 +7,7 @@ import { AlpacaTradTy } from './types';
 
 export async function getListOfFilenames(dirPath: string): Promise<string[]> {
   const fileNames: string[] = await fs.readdir(dirPath);
+  if (!fileNames.length) throw new Error('Please provide files. No YYYYMMDD.json files to process');
   Validator.fileNames(fileNames);
   return fileNames.sort();
 }
