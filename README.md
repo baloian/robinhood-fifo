@@ -1,6 +1,7 @@
 # Alpaca FIFO
-This is a TypeScript library that provides functionality to calculate Alpaca trading gain or loss based on FIFO using Alpaca `<YYYYMMDD>.json`
-reports as inputs. We do this because Alpaca no longer supports FIFO.
+This TypeScript library provides functionality to calculate [Alpaca Markets](https://alpaca.markets/)
+trading gains or losses based on FIFO using Alpaca `<YYYYMMDD>.json` reports as inputs. We do this because
+Alpaca no longer supports FIFO.
 
 ## Install
 ```bash
