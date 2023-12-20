@@ -12,8 +12,7 @@ import {
 
 
 // This is a global variable where I keep orders for every symbol in a queue.
-const gQueue: {[key: string]: any} = {};
-
+let gQueue: {[key: string]: any} = {};
 // These are global variables where I keep data for writing in a CSV file.
 type StringListTy = string[];
 let gFileTxsData: StringListTy[] = [];
@@ -25,6 +24,7 @@ export class AlpacaFIFO {
     inputDirPath: string = String(process.env.INPUTS),
     outputDirPath: string = String(process.env.OUTPUTS)
   ): Promise<void> {
+    AlpacaFIFO.reset();
     const fileNames = await getListOfFilenames(inputDirPath);
     if (!fileNames.length) throw new Error('Please provide files. No YYYYMMDD.json files to process');
 
@@ -75,6 +75,12 @@ export class AlpacaFIFO {
       // AAPL from the 4 AAPL buy.
       // TODO
     }
+  }
+
+  private static reset(): void {
+    gQueue = {};
+    gFileTxsData = [];
+    gFileFeeData = [];
   }
 }
 
