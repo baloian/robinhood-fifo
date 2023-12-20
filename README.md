@@ -32,6 +32,9 @@ In the root directory, execute the following command
 npm run start
 ```
 
+## Results
+In the `OUTPUTS` directory, you should see `alpaca-fifo-<YYYY>.csv` and `alpaca-fees-<YYYY>.csv` files for each year. 
+
 
 ## Use as a Dependency library
 You can use the project asa  dependency lib of your project.
