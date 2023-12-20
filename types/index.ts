@@ -16,3 +16,5 @@ export interface AlpacaTradTy {
   execution_id: string;
   trade_time_ms: number;
 }
+
+export type StringListTy = string[];
