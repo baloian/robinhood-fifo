@@ -3,6 +3,10 @@ This TypeScript library provides functionality to calculate [Alpaca Markets](htt
 trading gains or losses based on FIFO using Alpaca `<YYYYMMDD>.json` reports as inputs. We do this because
 Alpaca no longer supports FIFO.
 
+**IMPORTANT:** The `alpaca-fifo` project DOES NOT generate tax forms of any kind. It helps you calculate gains
+and losses in FIFO mode for your taxes.
+
+
 ## Install
 ```bash
 git clone git@github.com:baloian/alpaca-fifo.git
