@@ -13,11 +13,10 @@ import {
 // This is a global variable where I keep orders for every symbol in a queue.
 const gQueue: {[key: string]: any} = {};
 
-// This is a global variable where I keep data for writing in a CSV file.
+// These are global variables where I keep data for writing in a CSV file.
 type StringListTy = string[];
-let gData: StringListTy[] = [];
-
-let gFee: StringListTy[] = [];
+let gFileTxsData: StringListTy[] = [];
+let gFileFeeData: StringListTy[] = [];
 
 
 export class AlpacaFIFO {
@@ -39,12 +38,13 @@ export class AlpacaFIFO {
       // I do this because I create a separate <year>.csv file for each year.
       const tmpYear: number = getYearFromFile(fileName);
       if (currentYear !== tmpYear) {
-        await writeDataToFile(gData, gFee, currentYear, outputDirPath);
+        await writeDataToFile(gFileTxsData, gFileFeeData, currentYear, outputDirPath);
         currentYear = tmpYear;
-        gData = [];
+        gFileTxsData = [];
+        gFileFeeData = [];
       }
     }
-    await writeDataToFile(gData, gFee, currentYear, outputDirPath);
+    await writeDataToFile(gFileTxsData, gFileFeeData, currentYear, outputDirPath);
   }
 
   private static processBuyTrade(trade: AlpacaTradTy): void {
@@ -58,14 +58,14 @@ export class AlpacaFIFO {
     const buyTrade: AlpacaTradTy = symbolQueue.front();
     if (buyTrade.qty - sellTrade.qty === 0) {
       // This is when selling the entire order. For example, buying 5 APPL and then selling 5 APPL.
-      gData.push(getTradeRecord(buyTrade, sellTrade));
+      gFileTxsData.push(getTradeRecord(buyTrade, sellTrade));
       symbolQueue.pop();
     } else if (buyTrade.qty - sellTrade.qty > 0) {
       // This is when selling less than bought. For example, buying 5 APPL and then selling 3 APPL.
       // In this case, I should keep the order in the queue but decrease only the quantity.
       buyTrade.qty -= sellTrade.qty;
       symbolQueue.updateFront(buyTrade);
-      gData.push(getTradeRecord(buyTrade, sellTrade));
+      gFileTxsData.push(getTradeRecord(buyTrade, sellTrade));
     } else {
       // This is when selling more than the current but order.
       // For example, buying 5 APPL, and then buying 4 more APPL, and then selling 7 APPL.
