@@ -4,26 +4,52 @@ reports as inputs. We do this because Alpaca no longer supports FIFO.
 
 ## Install
 ```bash
-npm install github:baloian/alpaca-fifo
+git clone git@github.com:baloian/alpaca-fifo.git
+cd alpaca-fifo
+npm install
 ```
 
 ## Setup
+#### STEP 1:
+Create two directories, one for input (e.g. `INPUTS`) and the other for outputs (e.g. `OUTPUTS`).
+
+#### STEP 2:
+Download all the Alpaca `<YYYYMMDD>.json` files from your account documents and place them in the `INPUTS` folder. Please do not edit
+the filenames or their contents. Otherwise, the result will be incorrect.
+
+
+#### STEP 3:
 You need to set up environment variables by creating a `.env` file in the root directory and providing the following variables:
 ```bash
-INPUTS=<input files absolute path>
-OUTPUTS=<output absolute path>
+INPUTS=<absolute path of the inputs directory>
+OUTPUTS=<Absolute path of the outputs directory>
 ```
-Download all the Alpaca `<YYYYMMDD>.json` files from your account documents and place them in the `INPUTS` folder. Please do not edit
-the files or their contents. Otherwise, the result will be incorrect.
+
+## Run
+In the root directory, execute the following command
+```bash
+npm run start
+```
 
 
-## Usage
-Create an `inputs` directory in the root directory and upload all the `<YYYYMMDD>.json` files without any modifications.
+## Use as a Dependency library
+You can use the project asa  dependency lib of your project.
+
+#### Install
+```bash
+npm install github:baloian/alpaca-fifo
+```
+
+#### Usage
+Create an `inputs` and `outputs` directories and upload all the `<YYYYMMDD>.json` files without any modifications in the `inputs` directory.
 ```typescript
 import { AlpacaFIFO } from 'alpaca-fifo';
 
 (async () => {
-  await AlpacaFIFO.run();
+  const inputDirPath: string = '<absolute path of the directory>';
+  const outputDirPath: string = '<absolute path of the directory>';
+
+  await AlpacaFIFO.run(inputDirPath, outputDirPath);
 })();
 ```
 
