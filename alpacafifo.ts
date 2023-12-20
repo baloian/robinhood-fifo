@@ -6,7 +6,8 @@ import {
   readJsonFile,
   getTradeRecord,
   writeDataToFile,
-  getYearFromFile
+  getYearFromFile,
+  getFeeRecord
 } from './utils';
 
 
@@ -35,6 +36,7 @@ export class AlpacaFIFO {
         else AlpacaFIFO.processSellTrade(trade);
       }
 
+      gFileFeeData = getFeeRecord(fileData, gFileFeeData);
       // I do this because I create a separate <year>.csv file for each year.
       const tmpYear: number = getYearFromFile(fileName);
       if (currentYear !== tmpYear) {

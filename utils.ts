@@ -59,6 +59,24 @@ export function getTradeRecord(buyTrade: AlpacaTradTy, sellTrade: AlpacaTradTy):
 }
 
 
+// The format of each element is as follow:
+// [
+//   'Description',
+//   'Gross Amount'
+// ]
+export function getFeeRecord(fileData: any, gFileFeeData: any[]): any[] {
+  fileData.fee_activities.forEach((f: any) => {
+    const found: any = gFileFeeData.find((e) => e[0] === f.description);
+    if (found) {
+      found[1] = `${Number(found[1]) + Number(f.gross_amount)}`;
+    } else {
+      gFileFeeData.push([f.description, f.gross_amount]);
+    }
+  });
+  return gFileFeeData;
+}
+
+
 async function writeTrxsToFile(data: any[], currentYear: number, outputDirPath: string) {
   if (!data.length) return;
   const filePath: string = `${outputDirPath}/alpaca-fifo-${currentYear}.csv`;
