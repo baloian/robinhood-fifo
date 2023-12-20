@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import Queue from './queue';
+import Validator from './validator';
 import { AlpacaTradTy, StringListTy } from './types';
 import {
   getListOfFilenames,
@@ -52,8 +53,8 @@ export class AlpacaFIFO {
   }
 
   private static processSellTrade(sellTrade: AlpacaTradTy): void {
+    Validator.verifySell(this.gQueue, sellTrade.symbol, sellTrade.qty);
     const symbolQueue = this.gQueue[sellTrade.symbol];
-    if (!symbolQueue) throw new Error(`Failed to process sell for ${sellTrade.symbol}`);
     const buyTrade: AlpacaTradTy = symbolQueue.front();
     if (buyTrade.qty - sellTrade.qty === 0) {
       // This is when selling the entire order. For example, buying 5 APPL and then selling 5 APPL.

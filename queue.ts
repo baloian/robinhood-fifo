@@ -28,5 +28,11 @@ export default class Queue<T> {
   updateFront(data: T): void {
     this.items[0] = JSON.parse(JSON.stringify(data));
   }
+
+  totalQty(): number {
+    let total: number = 0;
+    this.items.forEach((e: any) => total += e.qty);
+    return total;
+  }
 }
 
