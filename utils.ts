@@ -3,6 +3,7 @@ import { round, timeDiff } from '@baloian/lib';
 import { promises as fs } from 'fs';
 import Validator from './validator';
 import { AlpacaTradTy } from './types';
+import { any } from 'zod';
 
 
 export async function getListOfFilenames(dirPath: string): Promise<string[]> {
@@ -121,4 +122,10 @@ export async function writeDataToFile(txData: any[], feeData: any[], currentYear
 
 export function getYearFromFile(filename: string): number {
   return Number(filename.substring(0, 4));
+}
+
+
+export function deepCopy(data: any): any {
+  if (data) return JSON.parse(JSON.stringify(data));
+  return data;
 }

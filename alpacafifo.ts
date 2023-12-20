@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { round } from '@baloian/lib';
 import Queue from './queue';
 import Validator from './validator';
 import { AlpacaTradTy, StringListTy } from './types';
@@ -8,7 +9,8 @@ import {
   getTradeRecord,
   writeDataToFile,
   getYearFromFile,
-  getFeeRecord
+  getFeeRecord,
+  deepCopy
 } from './utils';
 
 
@@ -56,22 +58,43 @@ export class AlpacaFIFO {
     Validator.verifySell(this.gQueue, sellTrade.symbol, sellTrade.qty);
     const symbolQueue = this.gQueue[sellTrade.symbol];
     const buyTrade: AlpacaTradTy = symbolQueue.front();
-    if (buyTrade.qty - sellTrade.qty === 0) {
-      // This is when selling the entire order. For example, buying 5 APPL and then selling 5 APPL.
-      this.gFileTxsData.push(getTradeRecord(buyTrade, sellTrade));
-      symbolQueue.pop();
-    } else if (buyTrade.qty - sellTrade.qty > 0) {
-      // This is when selling less than bought. For example, buying 5 APPL and then selling 3 APPL.
-      // In this case, I should keep the order in the queue but decrease only the quantity.
-      buyTrade.qty -= sellTrade.qty;
-      symbolQueue.updateFront(buyTrade);
-      this.gFileTxsData.push(getTradeRecord(buyTrade, sellTrade));
+    if (buyTrade.qty - sellTrade.qty === 0 || buyTrade.qty - sellTrade.qty > 0) {
+      AlpacaFIFO.sellFullOrPartially(buyTrade, sellTrade);
     } else {
       // This is when selling more than the current but order.
       // For example, buying 5 APPL, and then buying 4 more APPL, and then selling 7 APPL.
       // In this case, the current buying order is the 5 AAPL. I would need to sell 2 more
       // AAPL from the 4 AAPL buy.
-      // TODO
+      while (sellTrade.qty > 0) {
+        const tmpBuyTrade: AlpacaTradTy = symbolQueue.front();
+        const tmpSellTrade: AlpacaTradTy = deepCopy(sellTrade);
+        tmpSellTrade.qty = sellTrade.qty >= tmpBuyTrade.qty ? tmpBuyTrade.qty : sellTrade.qty;
+        tmpSellTrade.gross_amount = round(tmpSellTrade.qty * tmpSellTrade.price);
+        AlpacaFIFO.sellFullOrPartially(tmpBuyTrade, tmpSellTrade);
+
+        sellTrade.qty -= tmpSellTrade.qty;
+        sellTrade.gross_amount = round(sellTrade.qty * sellTrade.price);
+      }
+    }
+  }
+
+  // This is when selling the entire order. For example, buying 5 APPL and then selling 5 APPL.
+  // OR when selling less than bought. For example, buying 5 APPL and then selling 3 APPL.
+  private static sellFullOrPartially(buyTrade: AlpacaTradTy, sellTrade: AlpacaTradTy): void {
+    const symbolQueue = this.gQueue[sellTrade.symbol];
+    if (buyTrade.qty - sellTrade.qty === 0) {
+      this.gFileTxsData.push(getTradeRecord(buyTrade, sellTrade));
+      symbolQueue.pop();
+    } else if (buyTrade.qty - sellTrade.qty > 0) {
+      const tmpBuyTrade: AlpacaTradTy = deepCopy(buyTrade);
+      tmpBuyTrade.qty = sellTrade.qty;
+      tmpBuyTrade.gross_amount = round(tmpBuyTrade.qty * tmpBuyTrade.price);
+      this.gFileTxsData.push(getTradeRecord(tmpBuyTrade, sellTrade));
+
+      // This would be the remaining part (not sold yet).
+      buyTrade.qty -= sellTrade.qty;
+      buyTrade.gross_amount = round(buyTrade.qty * buyTrade.price);
+      symbolQueue.updateFront(buyTrade);
     }
   }
 
