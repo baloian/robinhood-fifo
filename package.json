@@ -11,7 +11,8 @@
   "scripts": {
     "build": "rm -rf dist && tsc",
     "prepare": "npm run build",
-    "dev": "tsc && NODE_ENV=${NODE_ENV-development} node dist/test.js"
+    "start": "tsc && NODE_ENV=${NODE_ENV-development} node dist/main.js",
+    "dev": "tsc && NODE_ENV=${NODE_ENV-development} node dist/main.js"
   },
   "engines": {
     "node": ">=20.3.0"
