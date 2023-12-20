@@ -1,5 +1,12 @@
+import moment from 'moment-timezone';
 import { z } from 'zod';
-import { isValidDateString } from './utils';
+
+
+function isValidDateString(value: string, format: string): boolean {
+  const date = moment(value, format);
+  return date.isValid();
+}
+
 
 export default class Validator {
   static fileNames(fileNames: string[]): void {

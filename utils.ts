@@ -1,8 +1,8 @@
 import moment from 'moment-timezone';
 import { round, timeDiff } from '@baloian/lib';
+import { promises as fs } from 'fs';
 import Validator from './validator';
 import { AlpacaTradTy } from './types';
-import { promises as fs } from 'fs';
 
 
 export async function getListOfFilenames(dirPath: string): Promise<string[]> {
@@ -34,12 +34,6 @@ export function parseOrders(fileData: any): Promise<any> {
 }
 
 
-export function isValidDateString(value: string, format: string): boolean {
-  const date = moment(value, format);
-  return date.isValid();
-}
-
-
 // The format is as follow:
 // [
 //   'Symbol',
@@ -65,7 +59,8 @@ export function getTradeRecord(buyTrade: AlpacaTradTy, sellTrade: AlpacaTradTy):
 }
 
 
-export async function writeCsvFile(data: any[], currentYear: number, outputDirPath: string) {
+async function writeTrxsToFile(data: any[], currentYear: number, outputDirPath: string) {
+  if (!data.length) return;
   const filePath: string = `${outputDirPath}/alpaca-fifo-${currentYear}.csv`;
   data.unshift(
     [
@@ -79,8 +74,29 @@ export async function writeCsvFile(data: any[], currentYear: number, outputDirPa
       'Gain or Loss'
     ]
   );
-  const csvContent = data.map(row => row.join(',')).join('\n');
+  await writeCsvFile(data, filePath);
+}
+
+
+async function writeFeesToFile(data: any[], currentYear: number, outputDirPath: string) {
+  if (!data.length) return;
+  const filePath: string = `${outputDirPath}/alpaca-fees-${currentYear}.csv`;
+  data.unshift(['Description', 'Gross Amount']);
+  await writeCsvFile(data, filePath);
+}
+
+
+async function writeCsvFile(data: any[], filePath: string) {
+  const csvContent = data.map((row) => row.join(',')).join('\n');
   await fs.writeFile(filePath, csvContent, 'utf-8');
+}
+
+
+export async function writeDataToFile(txData: any[], feeData: any[], currentYear: number, outputDirPath: string) {
+  await Promise.all([
+    writeTrxsToFile(txData, currentYear, outputDirPath),
+    writeFeesToFile(feeData, currentYear, outputDirPath)
+  ]);
 }
 
 

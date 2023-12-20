@@ -5,7 +5,7 @@ import {
   getListOfFilenames,
   readJsonFile,
   getTradeRecord,
-  writeCsvFile,
+  writeDataToFile,
   getYearFromFile
 } from './utils';
 
@@ -13,10 +13,11 @@ import {
 // This is a global variable where I keep orders for every symbol in a queue.
 const gQueue: {[key: string]: any} = {};
 
-
 // This is a global variable where I keep data for writing in a CSV file.
 type StringListTy = string[];
 let gData: StringListTy[] = [];
+
+let gFee: StringListTy[] = [];
 
 
 export class AlpacaFIFO {
@@ -38,12 +39,12 @@ export class AlpacaFIFO {
       // I do this because I create a separate <year>.csv file for each year.
       const tmpYear: number = getYearFromFile(fileName);
       if (currentYear !== tmpYear) {
-        await writeCsvFile(gData, currentYear, outputDirPath);
+        await writeDataToFile(gData, gFee, currentYear, outputDirPath);
         currentYear = tmpYear;
         gData = [];
       }
     }
-    await writeCsvFile(gData, currentYear, outputDirPath);
+    await writeDataToFile(gData, gFee, currentYear, outputDirPath);
   }
 
   private static processBuyTrade(trade: AlpacaTradTy): void {
