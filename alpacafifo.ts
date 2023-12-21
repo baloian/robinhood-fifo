@@ -43,14 +43,14 @@ export class AlpacaFIFO {
       const tmpYear: number = getYearFromFile(fileName);
       if (year !== tmpYear) {
         if (writeToFile) await writeDataToFile(this.txsData, this.feeData, year, outputDirPath);
-        if (callbackFn) callbackFn(this.txsData, this.feeData, year);
+        if (callbackFn) await callbackFn(this.txsData, this.feeData, year);
         year = tmpYear;
         this.txsData = [];
         this.feeData = [];
       }
     }
     if (writeToFile) await writeDataToFile(this.txsData, this.feeData, year, outputDirPath);
-    if (callbackFn) callbackFn(this.txsData, this.feeData, year);
+    if (callbackFn) await callbackFn(this.txsData, this.feeData, year);
   }
 
   private static processBuyTrade(trade: AlpacaTradTy): void {
