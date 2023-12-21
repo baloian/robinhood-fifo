@@ -3,7 +3,6 @@ import { round, timeDiff } from '@baloian/lib';
 import { promises as fs } from 'fs';
 import Validator from './validator';
 import { AlpacaTradTy } from './types';
-import { any } from 'zod';
 
 
 export async function getListOfFilenames(dirPath: string): Promise<string[]> {
