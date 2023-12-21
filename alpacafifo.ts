@@ -18,16 +18,18 @@ export class AlpacaFIFO {
   // This is a variable where I keep orders for every symbol in a queue.
   private static gQueue: {[key: string]: any} = {};
   // These are variables where I keep data for writing in a CSV file.
-  private static gFileTxsData: StringListTy[] = [];
-  private static gFileFeeData: StringListTy[] = [];
+  private static txsData: StringListTy[] = [];
+  private static feeData: StringListTy[] = [];
 
   public static async run(
     inputDirPath: string = String(process.env.INPUTS),
-    outputDirPath: string = String(process.env.OUTPUTS)
+    outputDirPath: string = String(process.env.OUTPUTS),
+    writeToFile: boolean = true,
+    callbackFn: any = null
   ): Promise<void> {
     AlpacaFIFO.reset();
     const fileNames = await getListOfFilenames(inputDirPath);
-    let currentYear: number = getYearFromFile(fileNames[0]);
+    let year: number = getYearFromFile(fileNames[0]);
 
     for (const fileName of fileNames) {
       const fileData = await readJsonFile(`${inputDirPath}/${fileName}`);
@@ -36,17 +38,19 @@ export class AlpacaFIFO {
         else AlpacaFIFO.processSellTrade(trade);
       }
 
-      this.gFileFeeData = getFeeRecord(fileData, this.gFileFeeData);
+      this.feeData = getFeeRecord(fileData, this.feeData);
       // I do this because I create a separate <year>.csv file for each year.
       const tmpYear: number = getYearFromFile(fileName);
-      if (currentYear !== tmpYear) {
-        await writeDataToFile(this.gFileTxsData, this.gFileFeeData, currentYear, outputDirPath);
-        currentYear = tmpYear;
-        this.gFileTxsData = [];
-        this.gFileFeeData = [];
+      if (year !== tmpYear) {
+        if (writeToFile) await writeDataToFile(this.txsData, this.feeData, year, outputDirPath);
+        if (callbackFn) callbackFn(this.txsData, this.feeData, year);
+        year = tmpYear;
+        this.txsData = [];
+        this.feeData = [];
       }
     }
-    await writeDataToFile(this.gFileTxsData, this.gFileFeeData, currentYear, outputDirPath);
+    if (writeToFile) await writeDataToFile(this.txsData, this.feeData, year, outputDirPath);
+    if (callbackFn) callbackFn(this.txsData, this.feeData, year);
   }
 
   private static processBuyTrade(trade: AlpacaTradTy): void {
@@ -83,13 +87,13 @@ export class AlpacaFIFO {
   private static sellFullOrPartially(buyTrade: AlpacaTradTy, sellTrade: AlpacaTradTy): void {
     const symbolQueue = this.gQueue[sellTrade.symbol];
     if (buyTrade.qty - sellTrade.qty === 0) {
-      this.gFileTxsData.push(getTradeRecord(buyTrade, sellTrade));
+      this.txsData.push(getTradeRecord(buyTrade, sellTrade));
       symbolQueue.pop();
     } else if (buyTrade.qty - sellTrade.qty > 0) {
       const tmpBuyTrade: AlpacaTradTy = deepCopy(buyTrade);
       tmpBuyTrade.qty = sellTrade.qty;
       tmpBuyTrade.gross_amount = round(tmpBuyTrade.qty * tmpBuyTrade.price);
-      this.gFileTxsData.push(getTradeRecord(tmpBuyTrade, sellTrade));
+      this.txsData.push(getTradeRecord(tmpBuyTrade, sellTrade));
 
       // This would be the remaining part (not sold yet).
       buyTrade.qty -= sellTrade.qty;
@@ -100,8 +104,8 @@ export class AlpacaFIFO {
 
   private static reset(): void {
     this.gQueue = {};
-    this.gFileTxsData = [];
-    this.gFileFeeData = [];
+    this.txsData = [];
+    this.feeData = [];
   }
 }
 
