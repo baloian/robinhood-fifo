@@ -68,7 +68,7 @@ The `run()` method takes an argument object with the following properties:
   inputDirPath:  <string>,   // absolute path of the directory>',
   outputDirPath: <string>,   // <absolute path of the directory>'
   writeToFile:   <boolean>,  // True if you want to write data to a .csv file. Default is true
-  callbackFn:    <function>  // Callback function to get data. callback(txsData, feeData, year). Default is null
+  callbackFn:    <function>  // Callback function. callback(txsData, feeData, year). Default is null
 }
 ```
 
