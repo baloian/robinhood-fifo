@@ -7,7 +7,7 @@ Alpaca no longer supports FIFO.
 and losses in FIFO mode for your taxes.
 
 
-## Install
+## Build
 ```bash
 git clone git@github.com:baloian/alpaca-fifo.git
 cd alpaca-fifo
