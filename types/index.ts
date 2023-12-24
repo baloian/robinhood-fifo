@@ -18,3 +18,11 @@ export interface AlpacaTradTy {
 }
 
 export type StringListTy = string[];
+
+
+export interface ArgumenTy {
+  inputDirPath: string;
+  outputDirPath: string;
+  writeToFile: boolean;
+  callbackFn: any;
+}

@@ -2,7 +2,7 @@ import moment from 'moment-timezone';
 import { round, timeDiff } from '@baloian/lib';
 import { promises as fs } from 'fs';
 import Validator from './validator';
-import { AlpacaTradTy } from './types';
+import { AlpacaTradTy, ArgumenTy } from './types';
 
 
 export async function getListOfFilenames(dirPath: string): Promise<string[]> {
@@ -127,4 +127,14 @@ export function getYearFromFile(filename: string): number {
 export function deepCopy(data: any): any {
   if (data) return JSON.parse(JSON.stringify(data));
   return data;
+}
+
+
+export function parseArgs(args: any): ArgumenTy {
+  if (typeof args !== 'object') throw new Error('Provided argument is not valid');
+  if (!args.inputDirPath) args.inputDirPath = String(process.env.INPUTS);
+  if (!args.outputDirPath) args.outputDirPath = String(process.env.OUTPUTS);
+  if (args.writeToFile === undefined) args.writeToFile = true;
+  if (args.callbackFn === undefined) args.callbackFn = null;
+  return args;
 }

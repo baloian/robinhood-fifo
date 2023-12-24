@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { round } from '@baloian/lib';
 import Queue from './queue';
 import Validator from './validator';
-import { AlpacaTradTy, StringListTy } from './types';
+import { AlpacaTradTy, StringListTy, ArgumenTy } from './types';
 import {
   getListOfFilenames,
   readJsonFile,
@@ -10,7 +10,8 @@ import {
   writeDataToFile,
   getYearFromFile,
   getFeeRecord,
-  deepCopy
+  deepCopy,
+  parseArgs
 } from './utils';
 
 
@@ -21,18 +22,14 @@ export class AlpacaFIFO {
   private txsData: StringListTy[] = [];
   private feeData: StringListTy[] = [];
 
-  async run(
-    inputDirPath: string = String(process.env.INPUTS),
-    outputDirPath: string = String(process.env.OUTPUTS),
-    writeToFile: boolean = true,
-    callbackFn: any = null
-  ): Promise<void> {
+  async run(argObj: any = {}): Promise<void> {
+    const args: ArgumenTy = parseArgs(argObj);
     this.reset();
-    const fileNames = await getListOfFilenames(inputDirPath);
+    const fileNames = await getListOfFilenames(args.inputDirPath);
     let year: number = getYearFromFile(fileNames[0]);
 
     for (const fileName of fileNames) {
-      const fileData = await readJsonFile(`${inputDirPath}/${fileName}`);
+      const fileData = await readJsonFile(`${args.inputDirPath}/${fileName}`);
       for (const trade of fileData.trade_activities) {
         if (trade.side === 'buy') this.processBuyTrade(trade);
         else this.processSellTrade(trade);
@@ -42,15 +39,18 @@ export class AlpacaFIFO {
       // I do this because I create a separate <year>.csv file for each year.
       const tmpYear: number = getYearFromFile(fileName);
       if (year !== tmpYear) {
-        if (writeToFile) await writeDataToFile(this.txsData, this.feeData, year, outputDirPath);
-        if (callbackFn) await callbackFn(this.txsData, this.feeData, year);
+        await this.writeDataToFiles(args, year);
         year = tmpYear;
         this.txsData = [];
         this.feeData = [];
       }
     }
-    if (writeToFile) await writeDataToFile(this.txsData, this.feeData, year, outputDirPath);
-    if (callbackFn) await callbackFn(this.txsData, this.feeData, year);
+    await this.writeDataToFiles(args, year);
+  }
+
+  private async writeDataToFiles(args: ArgumenTy, year: number): Promise<void> {
+    if (args.writeToFile) await writeDataToFile(this.txsData, this.feeData, year, args.outputDirPath);
+    if (args.callbackFn) await args.callbackFn(this.txsData, this.feeData, year);
   }
 
   private processBuyTrade(trade: AlpacaTradTy): void {
