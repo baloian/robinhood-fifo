@@ -55,11 +55,21 @@ Create an `inputs` and `outputs` directories and upload all the `<YYYYMMDD>.json
 import { AlpacaFIFO } from 'alpaca-fifo';
 
 (async () => {
-  const inputDirPath: string = '<absolute path of the directory>';
-  const outputDirPath: string = '<absolute path of the directory>';
-
-  await AlpacaFIFO.run(inputDirPath, outputDirPath);
+  const alpacaFIFO = new AlpacaFIFO();
+  await alpacaFIFO.run({
+    inputDirPath: '<absolute path of the directory>',
+    outputDirPath: '<absolute path of the directory>'
+  });
 })();
+```
+The `run()` method takes an argument object with the following properties:
+```typescript
+{
+  inputDirPath:  <string>,   // absolute path of the directory>',
+  outputDirPath: <string>,   // <absolute path of the directory>'
+  writeToFile:   <boolean>,  // True if you want to write data to a .csv file. Default is true
+  callbackFn:    <function>  // Callback function to get data. callback(txsData, feeData, year). Default is null
+}
 ```
 
 ## Contributions
