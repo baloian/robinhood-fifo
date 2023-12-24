@@ -6,5 +6,6 @@ import { AlpacaFIFO } from './alpacafifo';
  * This is the main entry point to the entire project.
  */
 (async () => {
-  await AlpacaFIFO.run();
+  const alpacaFIFO = new AlpacaFIFO();
+  await alpacaFIFO.run();
 })().catch(abort);

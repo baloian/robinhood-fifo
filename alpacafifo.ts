@@ -16,26 +16,26 @@ import {
 
 export class AlpacaFIFO {
   // This is a variable where I keep orders for every symbol in a queue.
-  private static gQueue: {[key: string]: any} = {};
+  private gQueue: {[key: string]: any} = {};
   // These are variables where I keep data for writing in a CSV file.
-  private static txsData: StringListTy[] = [];
-  private static feeData: StringListTy[] = [];
+  private txsData: StringListTy[] = [];
+  private feeData: StringListTy[] = [];
 
-  public static async run(
+  async run(
     inputDirPath: string = String(process.env.INPUTS),
     outputDirPath: string = String(process.env.OUTPUTS),
     writeToFile: boolean = true,
     callbackFn: any = null
   ): Promise<void> {
-    AlpacaFIFO.reset();
+    this.reset();
     const fileNames = await getListOfFilenames(inputDirPath);
     let year: number = getYearFromFile(fileNames[0]);
 
     for (const fileName of fileNames) {
       const fileData = await readJsonFile(`${inputDirPath}/${fileName}`);
       for (const trade of fileData.trade_activities) {
-        if (trade.side === 'buy') AlpacaFIFO.processBuyTrade(trade);
-        else AlpacaFIFO.processSellTrade(trade);
+        if (trade.side === 'buy') this.processBuyTrade(trade);
+        else this.processSellTrade(trade);
       }
 
       this.feeData = getFeeRecord(fileData, this.feeData);
@@ -53,17 +53,17 @@ export class AlpacaFIFO {
     if (callbackFn) await callbackFn(this.txsData, this.feeData, year);
   }
 
-  private static processBuyTrade(trade: AlpacaTradTy): void {
+  private processBuyTrade(trade: AlpacaTradTy): void {
     if (!this.gQueue[trade.symbol]) this.gQueue[trade.symbol] = new Queue<AlpacaTradTy>();
     this.gQueue[trade.symbol].push({...trade});
   }
 
-  private static processSellTrade(sellTrade: AlpacaTradTy): void {
+  private processSellTrade(sellTrade: AlpacaTradTy): void {
     Validator.verifySell(this.gQueue, sellTrade.symbol, sellTrade.qty);
     const symbolQueue = this.gQueue[sellTrade.symbol];
     const buyTrade: AlpacaTradTy = symbolQueue.front();
     if (buyTrade.qty - sellTrade.qty === 0 || buyTrade.qty - sellTrade.qty > 0) {
-      AlpacaFIFO.sellFullOrPartially(buyTrade, sellTrade);
+      this.sellFullOrPartially(buyTrade, sellTrade);
     } else {
       // This is when selling more than the current but order.
       // For example, buying 5 APPL, and then buying 4 more APPL, and then selling 7 APPL.
@@ -74,7 +74,7 @@ export class AlpacaFIFO {
         const tmpSellTrade: AlpacaTradTy = deepCopy(sellTrade);
         tmpSellTrade.qty = sellTrade.qty >= tmpBuyTrade.qty ? tmpBuyTrade.qty : sellTrade.qty;
         tmpSellTrade.gross_amount = round(tmpSellTrade.qty * tmpSellTrade.price);
-        AlpacaFIFO.sellFullOrPartially(tmpBuyTrade, tmpSellTrade);
+        this.sellFullOrPartially(tmpBuyTrade, tmpSellTrade);
 
         sellTrade.qty -= tmpSellTrade.qty;
         sellTrade.gross_amount = round(sellTrade.qty * sellTrade.price);
@@ -84,7 +84,7 @@ export class AlpacaFIFO {
 
   // This is when selling the entire order. For example, buying 5 APPL and then selling 5 APPL.
   // OR when selling less than bought. For example, buying 5 APPL and then selling 3 APPL.
-  private static sellFullOrPartially(buyTrade: AlpacaTradTy, sellTrade: AlpacaTradTy): void {
+  private sellFullOrPartially(buyTrade: AlpacaTradTy, sellTrade: AlpacaTradTy): void {
     const symbolQueue = this.gQueue[sellTrade.symbol];
     if (buyTrade.qty - sellTrade.qty === 0) {
       this.txsData.push(getTradeRecord(buyTrade, sellTrade));
@@ -102,7 +102,7 @@ export class AlpacaFIFO {
     }
   }
 
-  private static reset(): void {
+  private reset(): void {
     this.gQueue = {};
     this.txsData = [];
     this.feeData = [];
