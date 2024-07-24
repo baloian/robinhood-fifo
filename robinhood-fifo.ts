@@ -3,7 +3,7 @@ import * as path from 'path';
 import { round } from '@baloian/lib';
 import Queue from './queue';
 import Validator from './validator';
-import { StringListTy, HoodTradeTy } from './types';
+import { HoodTradeTy } from './types';
 import {
   getListOfFilenames,
   readJsonFile,
@@ -12,8 +12,6 @@ import {
   getYearFromFile,
   getFeeRecord,
   deepCopy,
-  parseArgs,
-  parsePdfToJson,
   parseCSV,
   filterRowsByTransCode
 } from './utils';
@@ -23,8 +21,8 @@ export class RobinhoodFIFO {
   // This is a variable where I keep orders for every symbol in a queue.
   private gQueue: {[key: string]: any} = {};
   // These are variables where I keep data for writing in a CSV file.
-  private txsData: StringListTy[] = [];
-  private feeData: StringListTy[] = [];
+  private txsData: string[] = [];
+  private feeData: string[] = [];
 
   async run(): Promise<void> {
     try {
@@ -43,13 +41,13 @@ export class RobinhoodFIFO {
   }
 
   private processBuyTrade(trade: HoodTradeTy): void {
-    if (!this.gQueue[trade.instrument]) this.gQueue[trade.instrument] = new Queue<HoodTradeTy>();
-    this.gQueue[trade.instrument].push({...trade});
+    if (!this.gQueue[trade.symbol]) this.gQueue[trade.symbol] = new Queue<HoodTradeTy>();
+    this.gQueue[trade.symbol].push({...trade});
   }
 
   private processSellTrade(sellTrade: HoodTradeTy): void {
-    Validator.verifySell(this.gQueue, sellTrade.instrument, sellTrade.quantity);
-    const symbolQueue = this.gQueue[sellTrade.instrument];
+    Validator.verifySell(this.gQueue, sellTrade.symbol, sellTrade.quantity);
+    const symbolQueue = this.gQueue[sellTrade.symbol];
     const buyTrade: HoodTradeTy = symbolQueue.front();
     if (buyTrade.quantity - sellTrade.quantity === 0 || buyTrade.quantity - sellTrade.quantity > 0) {
       this.sellFullOrPartially(buyTrade, sellTrade);
@@ -74,7 +72,7 @@ export class RobinhoodFIFO {
   // This is when selling the entire order. For example, buying 5 APPL and then selling 5 APPL.
   // OR when selling less than bought. For example, buying 5 APPL and then selling 3 APPL.
   private sellFullOrPartially(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): void {
-    const symbolQueue = this.gQueue[sellTrade.instrument];
+    const symbolQueue = this.gQueue[sellTrade.symbol];
     if (buyTrade.quantity - sellTrade.quantity === 0) {
       this.txsData.push(getTradeRecord(buyTrade, sellTrade));
       symbolQueue.pop();

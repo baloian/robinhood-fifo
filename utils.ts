@@ -4,7 +4,7 @@ import { promises as asyncfs } from 'fs';
 import fs from 'fs';
 import csv from 'csv-parser';
 import Validator from './validator';
-import { ArgumenTy, HoodTradeTy } from './types';
+import { HoodTradeTy } from './types';
 
 
 export async function getListOfFilenames(dirPath: string): Promise<string[]> {
@@ -51,6 +51,8 @@ export function parseOrders(fileData: any): Promise<any> {
 // ]
 export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): string[] {
   return [
+    'abc'
+    /*
     buyTrade.symbol,
     `${buyTrade.qty}`,
     `${buyTrade.trade_date}T${buyTrade.trade_time}`,
@@ -59,6 +61,7 @@ export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): s
     `${buyTrade.gross_amount}`,
     `${Math.abs(sellTrade.gross_amount)}`,
     `${round((Math.abs(sellTrade.gross_amount) - Math.abs(buyTrade.gross_amount)))}`
+    */
   ];
 }
 
@@ -133,36 +136,6 @@ export function deepCopy(data: any): any {
 }
 
 
-export function parseArgs(args: any): ArgumenTy {
-  if (typeof args !== 'object') throw new Error('Provided argument is not valid');
-  if (!args.inputDirPath) args.inputDirPath = String(process.env.INPUTS);
-  if (!args.outputDirPath) args.outputDirPath = String(process.env.OUTPUTS);
-  if (args.writeToFile === undefined) args.writeToFile = true;
-  if (args.callbackFn === undefined) args.callbackFn = null;
-  return args;
-}
-
-
-export async function parsePdfToJson(filePath: string): Promise<any> {
-  const { PdfReader } = await import('pdfreader');
-  const pdfReader = new PdfReader(null);
-  const items: any[] = [];
-
-  return new Promise((resolve, reject) => {
-    pdfReader.parseFileItems(filePath, (err, item) => {
-      if (err) {
-        return reject(err);
-      }
-      if (!item) {
-        // End of file
-        return resolve(items);
-      }
-      items.push(item);
-    });
-  });
-}
-
-
 function convertToNumber(value: string): number {
   // Remove currency symbols and parentheses
   let cleanedValue = value.replace(/[\$,()]/g, '');
@@ -181,7 +154,7 @@ export async function parseCSV(filePath: string): Promise<HoodTradeTy []> {
           activity_date: data['Activity Date'],
           process_date: data['Process Date'],
           settle_date: data['Settle Date'],
-          instrument: data['Instrument'],
+          symbol: data['Instrument'],
           description: data['Description'],
           trans_code: data['Trans Code'],
           quantity: convertToNumber(data['Quantity'] || ''),
