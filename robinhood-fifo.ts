@@ -3,7 +3,7 @@ import * as path from 'path';
 import { round } from '@baloian/lib';
 import Queue from './queue';
 import Validator from './validator';
-import { AlpacaTradTy, StringListTy, ArgumenTy, CsvRowTy } from './types';
+import { StringListTy, HoodTradeTy } from './types';
 import {
   getListOfFilenames,
   readJsonFile,
@@ -26,92 +26,67 @@ export class RobinhoodFIFO {
   private txsData: StringListTy[] = [];
   private feeData: StringListTy[] = [];
 
-  async run(argObj: any = {}): Promise<void> {
+  async run(): Promise<void> {
     try {
+      this.reset();
       const filePath = path.resolve(__dirname, '../robinhood.csv');
-      const rows: CsvRowTy[] = await parseCSV(filePath);
+      const rows: HoodTradeTy[] = await parseCSV(filePath);
       const trades = filterRowsByTransCode(rows);
-      console.log(trades);
-    } catch (error) {
-      console.error('Error parsing PDF:', error);
-    }
-    /*
-    const args: ArgumenTy = parseArgs(argObj);
-    this.reset();
-
-    const fileNames = await getListOfFilenames(args.inputDirPath);
-
-    let year: number = getYearFromFile(fileNames[0]);
-    for (const fileName of fileNames) {
-      const fileData = await readJsonFile(`${args.inputDirPath}/${fileName}`);
-      for (const trade of fileData.trade_activities) {
-        if (trade.side === 'buy') this.processBuyTrade(trade);
+      for (const trade of trades) {
+        if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
         else this.processSellTrade(trade);
       }
-      this.feeData = getFeeRecord(fileData, this.feeData);
-      const tmpYear: number = getYearFromFile(fileName);
-      if (year !== tmpYear) {
-        // This is because I create a separate <year>.csv file for each year.
-        await this.writeDataToFiles(args, year);
-        year = tmpYear;
-        this.txsData = [];
-        this.feeData = [];
-      }
+      console.log(trades);
+    } catch (error) {
+      console.error(error);
     }
-    await this.writeDataToFiles(args, year);
-    */
   }
 
-  private async writeDataToFiles(args: ArgumenTy, year: number): Promise<void> {
-    if (args.writeToFile) await writeDataToFile(this.txsData, this.feeData, year, args.outputDirPath);
-    if (args.callbackFn) await args.callbackFn(this.txsData, this.feeData, year);
+  private processBuyTrade(trade: HoodTradeTy): void {
+    if (!this.gQueue[trade.instrument]) this.gQueue[trade.instrument] = new Queue<HoodTradeTy>();
+    this.gQueue[trade.instrument].push({...trade});
   }
 
-  private processBuyTrade(trade: AlpacaTradTy): void {
-    if (!this.gQueue[trade.symbol]) this.gQueue[trade.symbol] = new Queue<AlpacaTradTy>();
-    this.gQueue[trade.symbol].push({...trade});
-  }
-
-  private processSellTrade(sellTrade: AlpacaTradTy): void {
-    Validator.verifySell(this.gQueue, sellTrade.symbol, sellTrade.qty);
-    const symbolQueue = this.gQueue[sellTrade.symbol];
-    const buyTrade: AlpacaTradTy = symbolQueue.front();
-    if (buyTrade.qty - sellTrade.qty === 0 || buyTrade.qty - sellTrade.qty > 0) {
+  private processSellTrade(sellTrade: HoodTradeTy): void {
+    Validator.verifySell(this.gQueue, sellTrade.instrument, sellTrade.quantity);
+    const symbolQueue = this.gQueue[sellTrade.instrument];
+    const buyTrade: HoodTradeTy = symbolQueue.front();
+    if (buyTrade.quantity - sellTrade.quantity === 0 || buyTrade.quantity - sellTrade.quantity > 0) {
       this.sellFullOrPartially(buyTrade, sellTrade);
     } else {
       // This is when selling more than the current but order.
       // For example, buying 5 APPL, and then buying 4 more APPL, and then selling 7 APPL.
       // In this case, the current buying order is the 5 AAPL. I would need to sell 2 more
       // AAPL from the 4 AAPL buy.
-      while (sellTrade.qty > 0) {
-        const tmpBuyTrade: AlpacaTradTy = symbolQueue.front();
-        const tmpSellTrade: AlpacaTradTy = deepCopy(sellTrade);
-        tmpSellTrade.qty = sellTrade.qty >= tmpBuyTrade.qty ? tmpBuyTrade.qty : sellTrade.qty;
-        tmpSellTrade.gross_amount = round(tmpSellTrade.qty * tmpSellTrade.price);
+      while (sellTrade.quantity > 0) {
+        const tmpBuyTrade: HoodTradeTy = symbolQueue.front();
+        const tmpSellTrade: HoodTradeTy = deepCopy(sellTrade);
+        tmpSellTrade.quantity = sellTrade.quantity >= tmpBuyTrade.quantity ? tmpBuyTrade.quantity : sellTrade.quantity;
+        tmpSellTrade.amount = round(tmpSellTrade.quantity * tmpSellTrade.price);
         this.sellFullOrPartially(tmpBuyTrade, tmpSellTrade);
 
-        sellTrade.qty -= tmpSellTrade.qty;
-        sellTrade.gross_amount = round(sellTrade.qty * sellTrade.price);
+        sellTrade.quantity -= tmpSellTrade.quantity;
+        sellTrade.amount = round(sellTrade.quantity * sellTrade.price);
       }
     }
   }
 
   // This is when selling the entire order. For example, buying 5 APPL and then selling 5 APPL.
   // OR when selling less than bought. For example, buying 5 APPL and then selling 3 APPL.
-  private sellFullOrPartially(buyTrade: AlpacaTradTy, sellTrade: AlpacaTradTy): void {
-    const symbolQueue = this.gQueue[sellTrade.symbol];
-    if (buyTrade.qty - sellTrade.qty === 0) {
+  private sellFullOrPartially(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): void {
+    const symbolQueue = this.gQueue[sellTrade.instrument];
+    if (buyTrade.quantity - sellTrade.quantity === 0) {
       this.txsData.push(getTradeRecord(buyTrade, sellTrade));
       symbolQueue.pop();
-    } else if (buyTrade.qty - sellTrade.qty > 0) {
-      const tmpBuyTrade: AlpacaTradTy = deepCopy(buyTrade);
-      tmpBuyTrade.qty = sellTrade.qty;
-      tmpBuyTrade.gross_amount = round(tmpBuyTrade.qty * tmpBuyTrade.price);
+    } else if (buyTrade.quantity - sellTrade.quantity > 0) {
+      const tmpBuyTrade: HoodTradeTy = deepCopy(buyTrade);
+      tmpBuyTrade.quantity = sellTrade.quantity;
+      tmpBuyTrade.amount = round(tmpBuyTrade.quantity * tmpBuyTrade.price);
       this.txsData.push(getTradeRecord(tmpBuyTrade, sellTrade));
 
       // This would be the remaining part (not sold yet).
-      buyTrade.qty -= sellTrade.qty;
-      buyTrade.gross_amount = round(buyTrade.qty * buyTrade.price);
+      buyTrade.quantity -= sellTrade.quantity;
+      buyTrade.amount = round(buyTrade.quantity * buyTrade.price);
       symbolQueue.updateFront(buyTrade);
     }
   }

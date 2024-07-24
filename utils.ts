@@ -1,11 +1,10 @@
 import moment from 'moment-timezone';
 import { round, timeDiff } from '@baloian/lib';
-import * as path from 'path';
 import { promises as asyncfs } from 'fs';
 import fs from 'fs';
 import csv from 'csv-parser';
 import Validator from './validator';
-import { AlpacaTradTy, ArgumenTy, CsvRowTy } from './types';
+import { ArgumenTy, HoodTradeTy } from './types';
 
 
 export async function getListOfFilenames(dirPath: string): Promise<string[]> {
@@ -40,16 +39,17 @@ export function parseOrders(fileData: any): Promise<any> {
 
 // The format is as follow:
 // [
-//   'Symbol',
-//   'Quantity',
-//   'Date Acquired',
-//   'Date Sold',
-//   'Holding Time',
-//   'Acquired Cost',
-//   'Sold Gross Amount',
-//   'Gain or Loss'
+//   activity_date: string;
+//   process_date: string;
+//   settle_date: string;
+//   instrument: string;
+//   description: string;
+//   trans_code: string;
+//   quantity: number;
+//   price: number;
+//   amount: number;
 // ]
-export function getTradeRecord(buyTrade: AlpacaTradTy, sellTrade: AlpacaTradTy): string[] {
+export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): string[] {
   return [
     buyTrade.symbol,
     `${buyTrade.qty}`,
@@ -163,22 +163,30 @@ export async function parsePdfToJson(filePath: string): Promise<any> {
 }
 
 
-export async function parseCSV(filePath: string): Promise<CsvRowTy []> {
+function convertToNumber(value: string): number {
+  // Remove currency symbols and parentheses
+  let cleanedValue = value.replace(/[\$,()]/g, '');
+  // Convert cleaned value to a number
+  return parseFloat(cleanedValue);
+}
+
+
+export async function parseCSV(filePath: string): Promise<HoodTradeTy []> {
   return new Promise((resolve, reject) => {
-    const results: CsvRowTy [] = [];
+    const results: HoodTradeTy [] = [];
     fs.createReadStream(filePath)
       .pipe(csv())
       .on('data', (data) => {
-        const row: CsvRowTy  = {
+        const row: HoodTradeTy  = {
           activity_date: data['Activity Date'],
           process_date: data['Process Date'],
           settle_date: data['Settle Date'],
           instrument: data['Instrument'],
           description: data['Description'],
           trans_code: data['Trans Code'],
-          quantity: data['Quantity'],
-          price: data['Price'],
-          amount: data['Amount']
+          quantity: convertToNumber(data['Quantity'] || ''),
+          price: convertToNumber(data['Price'] || ''),
+          amount: convertToNumber(data['Amount'] || '')
         };
         results.push(row);
       })
@@ -192,10 +200,10 @@ export async function parseCSV(filePath: string): Promise<CsvRowTy []> {
 }
 
 
-export function filterRowsByTransCode(rows: CsvRowTy []): CsvRowTy [] {
+export function filterRowsByTransCode(rows: HoodTradeTy []): HoodTradeTy [] {
   const filteredRows = rows.filter(row => row.trans_code === 'Sell' || row.trans_code === 'Buy');
   // Sort filtered rows by process_date
-  const sortedRows: CsvRowTy[] = filteredRows.sort((a, b) => {
+  const sortedRows: HoodTradeTy[] = filteredRows.sort((a, b) => {
     const dateA = new Date(a.process_date);
     const dateB = new Date(b.process_date);
     return dateA.getTime() - dateB.getTime();
