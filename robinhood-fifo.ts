@@ -5,12 +5,6 @@ import Queue from './queue';
 import Validator from './validator';
 import { HoodTradeTy } from './types';
 import {
-  getListOfFilenames,
-  readJsonFile,
-  getTradeRecord,
-  writeDataToFile,
-  getYearFromFile,
-  getFeeRecord,
   deepCopy,
   parseCSV,
   filterRowsByTransCode
@@ -52,7 +46,7 @@ export class RobinhoodFIFO {
     if (buyTrade.quantity - sellTrade.quantity === 0 || buyTrade.quantity - sellTrade.quantity > 0) {
       this.sellFullOrPartially(buyTrade, sellTrade);
     } else {
-      // This is when selling more than the current but order.
+      // This is when selling more than the current buy order.
       // For example, buying 5 APPL, and then buying 4 more APPL, and then selling 7 APPL.
       // In this case, the current buying order is the 5 AAPL. I would need to sell 2 more
       // AAPL from the 4 AAPL buy.
@@ -62,7 +56,6 @@ export class RobinhoodFIFO {
         tmpSellTrade.quantity = sellTrade.quantity >= tmpBuyTrade.quantity ? tmpBuyTrade.quantity : sellTrade.quantity;
         tmpSellTrade.amount = round(tmpSellTrade.quantity * tmpSellTrade.price);
         this.sellFullOrPartially(tmpBuyTrade, tmpSellTrade);
-
         sellTrade.quantity -= tmpSellTrade.quantity;
         sellTrade.amount = round(sellTrade.quantity * sellTrade.price);
       }
@@ -74,13 +67,13 @@ export class RobinhoodFIFO {
   private sellFullOrPartially(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): void {
     const symbolQueue = this.gQueue[sellTrade.symbol];
     if (buyTrade.quantity - sellTrade.quantity === 0) {
-      this.txsData.push(getTradeRecord(buyTrade, sellTrade));
+      // this.txsData.push(getTradeRecord(buyTrade, sellTrade));
       symbolQueue.pop();
     } else if (buyTrade.quantity - sellTrade.quantity > 0) {
       const tmpBuyTrade: HoodTradeTy = deepCopy(buyTrade);
       tmpBuyTrade.quantity = sellTrade.quantity;
       tmpBuyTrade.amount = round(tmpBuyTrade.quantity * tmpBuyTrade.price);
-      this.txsData.push(getTradeRecord(tmpBuyTrade, sellTrade));
+      // this.txsData.push(getTradeRecord(tmpBuyTrade, sellTrade));
 
       // This would be the remaining part (not sold yet).
       buyTrade.quantity -= sellTrade.quantity;
