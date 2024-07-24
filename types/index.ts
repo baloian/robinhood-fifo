@@ -26,3 +26,16 @@ export interface ArgumenTy {
   writeToFile: boolean;
   callbackFn: any;
 }
+
+
+export interface CsvRowTy {
+  activity_date: string;
+  process_date: string;
+  settle_date: string;
+  instrument: string;
+  description: string;
+  trans_code: string;
+  quantity: string;
+  price: string;
+  amount: string;
+};

@@ -1,13 +1,15 @@
 import moment from 'moment-timezone';
 import { round, timeDiff } from '@baloian/lib';
 import * as path from 'path';
-import { promises as fs } from 'fs';
+import { promises as asyncfs } from 'fs';
+import fs from 'fs';
+import csv from 'csv-parser';
 import Validator from './validator';
-import { AlpacaTradTy, ArgumenTy } from './types';
+import { AlpacaTradTy, ArgumenTy, CsvRowTy } from './types';
 
 
 export async function getListOfFilenames(dirPath: string): Promise<string[]> {
-  const fileNames: string[] = await fs.readdir(dirPath);
+  const fileNames: string[] = await asyncfs.readdir(dirPath);
   if (!fileNames.length) throw new Error('Please provide files. No YYYYMMDD.json files to process');
   Validator.fileNames(fileNames);
   return fileNames.sort();
@@ -15,7 +17,7 @@ export async function getListOfFilenames(dirPath: string): Promise<string[]> {
 
 
 export async function readJsonFile(filePath: string): Promise<any> {
-  const fileData = await fs.readFile(filePath, 'utf-8');
+  const fileData = await asyncfs.readFile(filePath, 'utf-8');
   const jsonData = JSON.parse(fileData);
   Validator.fileData(jsonData);
   return parseOrders(jsonData);
@@ -108,7 +110,7 @@ async function writeFeesToFile(data: any[], currentYear: number, outputDirPath: 
 
 async function writeCsvFile(data: any[], filePath: string) {
   const csvContent = data.map((row) => row.join(',')).join('\n');
-  await fs.writeFile(filePath, csvContent, 'utf-8');
+  await asyncfs.writeFile(filePath, csvContent, 'utf-8');
 }
 
 
@@ -158,4 +160,45 @@ export async function parsePdfToJson(filePath: string): Promise<any> {
       items.push(item);
     });
   });
+}
+
+
+export async function parseCSV(filePath: string): Promise<CsvRowTy []> {
+  return new Promise((resolve, reject) => {
+    const results: CsvRowTy [] = [];
+    fs.createReadStream(filePath)
+      .pipe(csv())
+      .on('data', (data) => {
+        const row: CsvRowTy  = {
+          activity_date: data['Activity Date'],
+          process_date: data['Process Date'],
+          settle_date: data['Settle Date'],
+          instrument: data['Instrument'],
+          description: data['Description'],
+          trans_code: data['Trans Code'],
+          quantity: data['Quantity'],
+          price: data['Price'],
+          amount: data['Amount']
+        };
+        results.push(row);
+      })
+      .on('end', () => {
+        resolve(results);
+      })
+      .on('error', (error: any) => {
+        reject(error);
+      });
+  });
+}
+
+
+export function filterRowsByTransCode(rows: CsvRowTy []): CsvRowTy [] {
+  const filteredRows = rows.filter(row => row.trans_code === 'Sell' || row.trans_code === 'Buy');
+  // Sort filtered rows by process_date
+  const sortedRows: CsvRowTy[] = filteredRows.sort((a, b) => {
+    const dateA = new Date(a.process_date);
+    const dateB = new Date(b.process_date);
+    return dateA.getTime() - dateB.getTime();
+  });
+  return sortedRows;
 }

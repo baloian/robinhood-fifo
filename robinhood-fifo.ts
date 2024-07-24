@@ -3,7 +3,7 @@ import * as path from 'path';
 import { round } from '@baloian/lib';
 import Queue from './queue';
 import Validator from './validator';
-import { AlpacaTradTy, StringListTy, ArgumenTy } from './types';
+import { AlpacaTradTy, StringListTy, ArgumenTy, CsvRowTy } from './types';
 import {
   getListOfFilenames,
   readJsonFile,
@@ -13,7 +13,9 @@ import {
   getFeeRecord,
   deepCopy,
   parseArgs,
-  parsePdfToJson
+  parsePdfToJson,
+  parseCSV,
+  filterRowsByTransCode
 } from './utils';
 
 
@@ -25,10 +27,11 @@ export class RobinhoodFIFO {
   private feeData: StringListTy[] = [];
 
   async run(argObj: any = {}): Promise<void> {
-    const filePath = path.resolve(__dirname, '../robinhood.pdf');
     try {
-      const jsonData = await parsePdfToJson(filePath);
-      console.log(JSON.stringify(jsonData, null, 2));
+      const filePath = path.resolve(__dirname, '../robinhood.csv');
+      const rows: CsvRowTy[] = await parseCSV(filePath);
+      const trades = filterRowsByTransCode(rows);
+      console.log(trades);
     } catch (error) {
       console.error('Error parsing PDF:', error);
     }

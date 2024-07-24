@@ -24,9 +24,10 @@
   },
   "dependencies": {
     "@baloian/lib": "github:baloian/lib",
+    "csv-parser": "^3.0.0",
     "dotenv": "^16.3.1",
+    "fs": "^0.0.1-security",
     "moment-timezone": "^0.5.43",
-    "pdfreader": "^3.0.2",
     "ts-node": "^10.9.2",
     "zod": "^3.22.4"
   },
