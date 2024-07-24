@@ -1,5 +1,6 @@
 import moment from 'moment-timezone';
 import { round, timeDiff } from '@baloian/lib';
+import * as path from 'path';
 import { promises as fs } from 'fs';
 import Validator from './validator';
 import { AlpacaTradTy, ArgumenTy } from './types';
@@ -137,4 +138,24 @@ export function parseArgs(args: any): ArgumenTy {
   if (args.writeToFile === undefined) args.writeToFile = true;
   if (args.callbackFn === undefined) args.callbackFn = null;
   return args;
+}
+
+
+export async function parsePdfToJson(filePath: string): Promise<any> {
+  const { PdfReader } = await import('pdfreader');
+  const pdfReader = new PdfReader(null);
+  const items: any[] = [];
+
+  return new Promise((resolve, reject) => {
+    pdfReader.parseFileItems(filePath, (err, item) => {
+      if (err) {
+        return reject(err);
+      }
+      if (!item) {
+        // End of file
+        return resolve(items);
+      }
+      items.push(item);
+    });
+  });
 }
