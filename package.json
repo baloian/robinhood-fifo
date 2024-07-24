@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "description": "Robinhood Trading Gain/Loss Calculator",
   "author": "Artiom Baloian <artiom.baloian@gmail.com>",
-  "main": "dist/robinhoodfifo.js",
-  "types": "dist/robinhoodfifo.d.ts",
+  "main": "dist/robinhood-fifo.js",
+  "types": "dist/robinhood-fifo.d.ts",
   "files": [
     "dist"
   ],

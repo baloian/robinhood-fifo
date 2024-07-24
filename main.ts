@@ -1,11 +1,11 @@
 import { abort } from '@baloian/lib';
-import { AlpacaFIFO } from './alpacafifo';
+import { RobinhoodFIFO } from './robinhood-fifo';
 
 
 /**
  * This is the main entry point to the entire project.
  */
 (async () => {
-  const alpacaFIFO = new AlpacaFIFO();
-  await alpacaFIFO.run();
+  const robinhoodFIFO = new RobinhoodFIFO();
+  await robinhoodFIFO.run();
 })().catch(abort);
