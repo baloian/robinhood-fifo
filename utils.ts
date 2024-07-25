@@ -1,7 +1,12 @@
 import { round, pctDiff} from '@baloian/lib';
 import fs from 'fs';
 import csv from 'csv-parser';
-import { HoodTradeTy, ClosingTradeTy, TotalProfitResultTy } from './types';
+import {
+  HoodTradeTy,
+  ClosingTradeTy,
+  TotalProfitResultTy,
+  SymbolProfitTy
+} from './types';
 
 
 export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): ClosingTradeTy {
@@ -171,4 +176,29 @@ export function printWithDots(value1: string, value2: string, symbol: string = '
 export function printTotalProfit(profit: TotalProfitResultTy): void {
   printWithDots('Total Profit ($)', formatToUSD(profit.total_profit));
   printWithDots('Total Profit (%)', `${profit.total_profit_pct}%`);
+}
+
+
+export function printSymbolTotalProfit(data: SymbolProfitTy[]): void {
+  data.forEach((item: SymbolProfitTy) => {
+    printWithDots(item.symbol, `${formatToUSD(item.total_profit)} / ${item.total_profit_pct}%`);
+  });
+}
+
+
+export function calculateSymbolProfits(trades: ClosingTradeTy[]): SymbolProfitTy[] {
+  const symbolProfits: { [key: string]: { total_profit: number; total_profit_pct: number } } = {};
+  trades.forEach(trade => {
+    const { symbol, profit, profit_pct } = trade;
+    if (!symbolProfits[symbol]) {
+      symbolProfits[symbol] = { total_profit: 0, total_profit_pct: 0 };
+    }
+    symbolProfits[symbol].total_profit += profit;
+    symbolProfits[symbol].total_profit_pct += profit_pct;
+  });
+  return Object.keys(symbolProfits).map(symbol => ({
+    symbol,
+    total_profit: round(symbolProfits[symbol].total_profit),
+    total_profit_pct: round(symbolProfits[symbol].total_profit_pct)
+  }));
 }

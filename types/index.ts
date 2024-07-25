@@ -28,3 +28,10 @@ export interface TotalProfitResultTy {
   total_profit: number;
   total_profit_pct: number;
 };
+
+
+export interface SymbolProfitTy {
+  symbol: string;
+  total_profit: number;
+  total_profit_pct: number;
+};
