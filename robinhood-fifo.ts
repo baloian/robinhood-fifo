@@ -22,7 +22,7 @@ import {
 } from './utils';
 
 
-export class RobinhoodFIFO {
+export default class RobinhoodFIFO {
   // This is a variable where I keep orders for every symbol in a queue.
   private gQueue: {[key: string]: any} = {};
   // These are variables where I keep data for writing in a CSV file.
@@ -70,7 +70,8 @@ export class RobinhoodFIFO {
       while (sellTrade.quantity > 0) {
         const tmpBuyTrade: HoodTradeTy = symbolQueue.front();
         const tmpSellTrade: HoodTradeTy = deepCopy(sellTrade);
-        tmpSellTrade.quantity = sellTrade.quantity >= tmpBuyTrade.quantity ? tmpBuyTrade.quantity : sellTrade.quantity;
+        tmpSellTrade.quantity = sellTrade.quantity >= tmpBuyTrade.quantity ?
+          tmpBuyTrade.quantity : sellTrade.quantity;
         tmpSellTrade.amount = round(tmpSellTrade.quantity * tmpSellTrade.price);
         this.sellFullOrPartially(tmpBuyTrade, tmpSellTrade);
         sellTrade.quantity -= tmpSellTrade.quantity;
