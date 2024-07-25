@@ -31,10 +31,7 @@ export class RobinhoodFIFO {
         if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
         else this.processSellTrade(trade);
       }
-      printTable(this.txsData);
-      console.log('');
-      const totalProfitRes: TotalProfitResultTy = calculateTotalProfit(this.txsData);
-      printTotalProfit(totalProfitRes);
+      this.printResults();
     } catch (error) {
       console.error(error);
     }
@@ -91,6 +88,13 @@ export class RobinhoodFIFO {
     this.gQueue = {};
     this.txsData = [];
     this.feeData = [];
+  }
+
+  private printResults(): void {
+    printTable(this.txsData);
+    console.log('');
+    const totalProfitRes: TotalProfitResultTy = calculateTotalProfit(this.txsData);
+    printTotalProfit(totalProfitRes);
   }
 }
 

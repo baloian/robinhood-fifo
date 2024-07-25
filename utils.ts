@@ -93,20 +93,20 @@ export function filterRowsByTransCode(rows: HoodTradeTy []): HoodTradeTy [] {
 export function printTable(trades: ClosingTradeTy[]): void {
   // Define the table headers
   const headers = ['Symbol', 'Qty', 'Sell Price', 'Sold At', 'Profit $', 'Profit %'];
-  const headerRow = headers.map(header => header.padEnd(12)).join(' | ');
-  const separator = headers.map(() => '------------').join('-|-');
+  const headerRow = headers.map(header => header.padEnd(11)).join(' | ');
+  const separator = headers.map(() => '-----------').join('-|-');
 
   console.log(headerRow);
   console.log(separator);
 
   trades.forEach(trade => {
     const rowString = [
-      trade.symbol.padEnd(12),
-      trade.sell_qty.toString().padEnd(12),
-      getDollarVal(trade.sell_price).padEnd(12),
-      trade.sell_process_date.padEnd(12),
-      getDollarVal(trade.profit).padEnd(12),
-      `${trade.profit_pct.toString()}%`.padEnd(12)
+      trade.symbol.padEnd(11),
+      trade.sell_qty.toString().padEnd(11),
+      getDollarVal(trade.sell_price).padEnd(11),
+      trade.sell_process_date.padEnd(11),
+      getDollarVal(trade.profit).padEnd(11),
+      `${trade.profit_pct.toString()}%`.padEnd(11)
     ].join(' | ');
     console.log(rowString);
   });
