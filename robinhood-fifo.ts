@@ -45,7 +45,13 @@ export class RobinhoodFIFO {
   }
 
   private processSellTrade(sellTrade: HoodTradeTy): void {
-    Validator.verifySell(this.gQueue, sellTrade.symbol, sellTrade.quantity);
+    const v = Validator.verifySell(this.gQueue, sellTrade.symbol, sellTrade.quantity);
+    if (v) {
+      console.error('WARNING!');
+      console.error(v);
+      console.log('This will not be part of the calculation.');
+      return;
+    }
     const symbolQueue = this.gQueue[sellTrade.symbol];
     const buyTrade: HoodTradeTy = symbolQueue.front();
     if (buyTrade.quantity - sellTrade.quantity === 0 || buyTrade.quantity - sellTrade.quantity > 0) {
