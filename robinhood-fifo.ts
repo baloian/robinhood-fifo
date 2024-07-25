@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import * as path from 'path';
 import { round } from '@baloian/lib';
 import Queue from './queue';
