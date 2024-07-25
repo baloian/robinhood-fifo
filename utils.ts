@@ -27,6 +27,11 @@ export function deepCopy(data: any): any {
 }
 
 
+function getDollarVal(val: number): string {
+  return val > 0 ? `$${val}` : `-$${Math.abs(val)}`;
+};
+
+
 function convertToNumber(value: string): number {
   // Remove currency symbols and parentheses
   let cleanedValue = value.replace(/[\$,()]/g, '');
@@ -82,4 +87,27 @@ export function filterRowsByTransCode(rows: HoodTradeTy []): HoodTradeTy [] {
     return dateA - dateB;
   });
   return sortedRows;
+}
+
+
+export function printTable(trades: ClosingTradeTy[]): void {
+  // Define the table headers
+  const headers = ['Symbol', 'Qty', 'Sell Price', 'Sold At', 'Profit $', 'Profit %'];
+  const headerRow = headers.map(header => header.padEnd(12)).join(' | ');
+  const separator = headers.map(() => '------------').join('-|-');
+
+  console.log(headerRow);
+  console.log(separator);
+
+  trades.forEach(trade => {
+    const rowString = [
+      trade.symbol.padEnd(12),
+      trade.sell_qty.toString().padEnd(12),
+      getDollarVal(trade.sell_price).padEnd(12),
+      trade.sell_process_date.padEnd(12),
+      getDollarVal(trade.profit).padEnd(12),
+      `${trade.profit_pct.toString()}%`.padEnd(12)
+    ].join(' | ');
+    console.log(rowString);
+  });
 }

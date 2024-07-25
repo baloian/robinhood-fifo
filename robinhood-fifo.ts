@@ -8,7 +8,8 @@ import {
   deepCopy,
   parseCSV,
   filterRowsByTransCode,
-  getTradeRecord
+  getTradeRecord,
+  printTable
 } from './utils';
 
 
@@ -25,12 +26,11 @@ export class RobinhoodFIFO {
       const filePath = path.resolve(__dirname, '../robinhood.csv');
       const rows: HoodTradeTy[] = await parseCSV(filePath);
       const trades = filterRowsByTransCode(rows);
-      // console.log(trades);
       for (const trade of trades) {
         if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
         else this.processSellTrade(trade);
       }
-      console.log(this.txsData);
+      printTable(this.txsData);
     } catch (error) {
       console.error(error);
     }
