@@ -11,7 +11,8 @@ import {
   printTable,
   calculateTotalProfit,
   printTotalProfit,
-  printWithDots
+  printWithDots,
+  printSummary
 } from './utils';
 
 
@@ -94,18 +95,24 @@ export class RobinhoodFIFO {
   private printResults(): void {
     if (this.txsData.length) {
       console.log('');
-      printWithDots('... Account Activity', '', '.');
+      printWithDots('*** Account Activity', '', '*');
       console.log('');
       printTable(this.txsData);
       console.log('');
       console.log('');
-      printWithDots('... Total Gain/Loss', '', '.');
+      printWithDots('*** Total Gain/Loss', '', '*');
       console.log('');
       const totalProfitRes: TotalProfitResultTy = calculateTotalProfit(this.txsData);
       printTotalProfit(totalProfitRes);
     }
     console.log('');
-    printWithDots('... Portfolio Summary', '', '.');
+    console.log('');
+    printWithDots('*** Portfolio Summary', '', '*');
+    console.log('');
+    Object.entries(this.gQueue).forEach(([symbol, queue]) => {
+      if (!queue.isEmpty()) printSummary(queue.getList());
+    });
+    console.log('');
   }
 }
 

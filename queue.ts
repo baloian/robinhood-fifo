@@ -34,5 +34,9 @@ export default class Queue<T> {
     this.items.forEach((e: any) => total += e.qty);
     return total;
   }
+
+  getList(): T[] {
+    return this.items;
+  }
 }
 

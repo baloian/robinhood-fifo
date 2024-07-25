@@ -113,6 +113,27 @@ export function printTable(trades: ClosingTradeTy[]): void {
 }
 
 
+export function printSummary(trades: HoodTradeTy[]): void {
+  // Define the table headers
+  const headers = ['Symbol', 'Qty', 'Amount', 'Processed At'];
+  const headerRow = headers.map(header => header.padEnd(12)).join(' | ');
+  const separator = headers.map(() => '------------').join('-|-');
+
+  console.log(headerRow);
+  console.log(separator);
+
+  trades.forEach(trade => {
+    const rowString = [
+      trade.symbol.padEnd(12),
+      trade.quantity.toString().padEnd(12),
+      getDollarVal(trade.amount).padEnd(12),
+      trade.process_date.padEnd(12)
+    ].join(' | ');
+    console.log(rowString);
+  });
+}
+
+
 export function calculateTotalProfit(trades: ClosingTradeTy[]): TotalProfitResultTy {
   let totalProfit = 0;
   let totalProfitPct = 0;
