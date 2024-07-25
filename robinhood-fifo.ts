@@ -3,11 +3,12 @@ import * as path from 'path';
 import { round } from '@baloian/lib';
 import Queue from './queue';
 import Validator from './validator';
-import { HoodTradeTy } from './types';
+import { HoodTradeTy, ClosingTradeTy } from './types';
 import {
   deepCopy,
   parseCSV,
-  filterRowsByTransCode
+  filterRowsByTransCode,
+  getTradeRecord
 } from './utils';
 
 
@@ -15,7 +16,7 @@ export class RobinhoodFIFO {
   // This is a variable where I keep orders for every symbol in a queue.
   private gQueue: {[key: string]: any} = {};
   // These are variables where I keep data for writing in a CSV file.
-  private txsData: string[] = [];
+  private txsData: ClosingTradeTy[] = [];
   private feeData: string[] = [];
 
   async run(): Promise<void> {
@@ -24,11 +25,12 @@ export class RobinhoodFIFO {
       const filePath = path.resolve(__dirname, '../robinhood.csv');
       const rows: HoodTradeTy[] = await parseCSV(filePath);
       const trades = filterRowsByTransCode(rows);
+      // console.log(trades);
       for (const trade of trades) {
         if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
-        else this.processSellTrade(trade);
+        // else this.processSellTrade(trade);
       }
-      console.log(trades);
+      console.log(this.gQueue.MSFT);
     } catch (error) {
       console.error(error);
     }
@@ -67,14 +69,13 @@ export class RobinhoodFIFO {
   private sellFullOrPartially(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): void {
     const symbolQueue = this.gQueue[sellTrade.symbol];
     if (buyTrade.quantity - sellTrade.quantity === 0) {
-      // this.txsData.push(getTradeRecord(buyTrade, sellTrade));
+      this.txsData.push(getTradeRecord(buyTrade, sellTrade) as any);
       symbolQueue.pop();
     } else if (buyTrade.quantity - sellTrade.quantity > 0) {
       const tmpBuyTrade: HoodTradeTy = deepCopy(buyTrade);
       tmpBuyTrade.quantity = sellTrade.quantity;
       tmpBuyTrade.amount = round(tmpBuyTrade.quantity * tmpBuyTrade.price);
-      // this.txsData.push(getTradeRecord(tmpBuyTrade, sellTrade));
-
+      this.txsData.push(getTradeRecord(tmpBuyTrade, sellTrade));
       // This would be the remaining part (not sold yet).
       buyTrade.quantity -= sellTrade.quantity;
       buyTrade.amount = round(buyTrade.quantity * buyTrade.price);

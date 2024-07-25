@@ -9,3 +9,14 @@ export interface HoodTradeTy {
   price: number;
   amount: number;
 };
+
+
+export interface ClosingTradeTy {
+  symbol: string;
+  buy_qty: number;
+  sell_qty: number;
+  buy_process_date: string;
+  sell_process_date: string;
+  buy_price: number;
+  sell_price: number;
+};

@@ -1,35 +1,19 @@
 import { round, timeDiff } from '@baloian/lib';
 import fs from 'fs';
 import csv from 'csv-parser';
-import { HoodTradeTy } from './types';
+import { HoodTradeTy, ClosingTradeTy } from './types';
 
 
-// The format is as follow:
-// [
-//   activity_date: string;
-//   process_date: string;
-//   settle_date: string;
-//   instrument: string;
-//   description: string;
-//   trans_code: string;
-//   quantity: number;
-//   price: number;
-//   amount: number;
-// ]
-export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): string[] {
-  return [
-    'abc'
-    /*
-    buyTrade.symbol,
-    `${buyTrade.qty}`,
-    `${buyTrade.trade_date}T${buyTrade.trade_time}`,
-    `${sellTrade.trade_date}T${sellTrade.trade_time}`,
-    timeDiff(buyTrade.trade_time_ms, sellTrade.trade_time_ms),
-    `${buyTrade.gross_amount}`,
-    `${Math.abs(sellTrade.gross_amount)}`,
-    `${round((Math.abs(sellTrade.gross_amount) - Math.abs(buyTrade.gross_amount)))}`
-    */
-  ];
+export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): ClosingTradeTy {
+  return {
+    symbol: buyTrade.symbol,
+    buy_qty: buyTrade.quantity,
+    sell_qty: sellTrade.quantity,
+    buy_process_date: buyTrade.process_date,
+    sell_process_date: sellTrade.process_date,
+    buy_price: buyTrade.price,
+    sell_price: sellTrade.price
+  };
 }
 
 
@@ -76,13 +60,22 @@ export async function parseCSV(filePath: string): Promise<HoodTradeTy []> {
 }
 
 
+function convertDateToMilliseconds(dateStr: string): number {
+  const [month, day, year] = dateStr.split('/').map(Number);
+  const date = new Date(year, month - 1, day);
+  // Get the time in milliseconds since the Unix epoch
+  const milliseconds = date.getTime();
+  return milliseconds;
+}
+
+
 export function filterRowsByTransCode(rows: HoodTradeTy []): HoodTradeTy [] {
   const filteredRows = rows.filter(row => row.trans_code === 'Sell' || row.trans_code === 'Buy');
   // Sort filtered rows by process_date
-  const sortedRows: HoodTradeTy[] = filteredRows.sort((a, b) => {
-    const dateA = new Date(a.process_date);
-    const dateB = new Date(b.process_date);
-    return dateA.getTime() - dateB.getTime();
+  const sortedRows: HoodTradeTy[] = filteredRows.reverse().sort((a, b) => {
+    const dateA = convertDateToMilliseconds(a.process_date);
+    const dateB = convertDateToMilliseconds(b.process_date);
+    return dateA - dateB;
   });
   return sortedRows;
 }
