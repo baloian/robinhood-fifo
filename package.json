@@ -1,10 +1,10 @@
 {
-  "name": "alpaca-fifo",
+  "name": "robinhood-fifo",
   "version": "0.0.1",
-  "description": "Alpaca Orders To FIFI Tax",
+  "description": "Robinhood Trading Gain/Loss Calculator",
   "author": "Artiom Baloian <artiom.baloian@gmail.com>",
-  "main": "dist/alpacafifo.js",
-  "types": "dist/alpacafifo.d.ts",
+  "main": "dist/robinhood-fifo.js",
+  "types": "dist/robinhood-fifo.d.ts",
   "files": [
     "dist"
   ],
@@ -20,18 +20,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/baloian/alpaca-fifo.git"
+    "url": "https://github.com/baloian/robinhood-fifo.git"
   },
   "dependencies": {
     "@baloian/lib": "github:baloian/lib",
-    "dotenv": "^16.3.1",
-    "moment-timezone": "^0.5.43",
-    "ts-node": "^10.9.2",
-    "zod": "^3.22.4"
+    "csv-parser": "^3.0.0",
+    "fs": "^0.0.1-security",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@types/jest": "^29.5.11",
-    "@types/moment": "^2.13.0",
     "@types/msgpack5": "^3.4.3",
     "@types/node": "^20.9.0",
     "@types/readable-stream": "^4.0.2",

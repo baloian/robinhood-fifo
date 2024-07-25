@@ -1,126 +1,23 @@
-import moment from 'moment-timezone';
-import { round, timeDiff } from '@baloian/lib';
-import { promises as fs } from 'fs';
-import Validator from './validator';
-import { AlpacaTradTy, ArgumenTy } from './types';
+import { round, pctDiff} from '@baloian/lib';
+import fs from 'fs';
+import csv from 'csv-parser';
+import { HoodTradeTy, ClosingTradeTy, TotalProfitResultTy } from './types';
 
 
-export async function getListOfFilenames(dirPath: string): Promise<string[]> {
-  const fileNames: string[] = await fs.readdir(dirPath);
-  if (!fileNames.length) throw new Error('Please provide files. No YYYYMMDD.json files to process');
-  Validator.fileNames(fileNames);
-  return fileNames.sort();
-}
-
-
-export async function readJsonFile(filePath: string): Promise<any> {
-  const fileData = await fs.readFile(filePath, 'utf-8');
-  const jsonData = JSON.parse(fileData);
-  Validator.fileData(jsonData);
-  return parseOrders(jsonData);
-}
-
-
-export function parseOrders(fileData: any): Promise<any> {
-  fileData.trade_activities.forEach((e: any) => {
-    const mt = moment(`${e.trade_date} ${e.trade_time}`, 'YYYY-MM-DD HH:mm:ss.SSS');
-    const nyTime = moment.tz(mt, 'America/New_York');
-    e.trade_time_ms = Number(nyTime.format('x'));
-    e.qty = Math.abs(e.qty);
-    e.price = Number(e.price);
-    e.gross_amount = Math.abs(e.gross_amount);
-  });
-  fileData.trade_activities = fileData.trade_activities.sort((a: any, b: any) => a.trade_time_ms - b.trade_time_ms);
-  return fileData;
-}
-
-
-// The format is as follow:
-// [
-//   'Symbol',
-//   'Quantity',
-//   'Date Acquired',
-//   'Date Sold',
-//   'Holding Time',
-//   'Acquired Cost',
-//   'Sold Gross Amount',
-//   'Gain or Loss'
-// ]
-export function getTradeRecord(buyTrade: AlpacaTradTy, sellTrade: AlpacaTradTy): string[] {
-  return [
-    buyTrade.symbol,
-    `${buyTrade.qty}`,
-    `${buyTrade.trade_date}T${buyTrade.trade_time}`,
-    `${sellTrade.trade_date}T${sellTrade.trade_time}`,
-    timeDiff(buyTrade.trade_time_ms, sellTrade.trade_time_ms),
-    `${buyTrade.gross_amount}`,
-    `${Math.abs(sellTrade.gross_amount)}`,
-    `${round((Math.abs(sellTrade.gross_amount) - Math.abs(buyTrade.gross_amount)))}`
-  ];
-}
-
-
-// The format of each element is as follow:
-// [
-//   'Description',
-//   'Gross Amount'
-// ]
-export function getFeeRecord(fileData: any, gFileFeeData: any[]): any[] {
-  fileData.fee_activities.forEach((f: any) => {
-    const found: any = gFileFeeData.find((e) => e[0] === f.description);
-    if (found) {
-      found[1] = `${Number(found[1]) + Number(f.gross_amount)}`;
-    } else {
-      gFileFeeData.push([f.description, f.gross_amount]);
-    }
-  });
-  return gFileFeeData;
-}
-
-
-async function writeTrxsToFile(data: any[], currentYear: number, outputDirPath: string) {
-  if (!data.length) return;
-  const filePath: string = `${outputDirPath}/alpaca-fifo-${currentYear}.csv`;
-  data.unshift(
-    [
-      'Symbol',
-      'Quantity',
-      'Date Acquired',
-      'Date Sold',
-      'Holding Time (~)',
-      'Acquired Cost',
-      'Sold Gross Amount',
-      'Gain or Loss'
-    ]
-  );
-  await writeCsvFile(data, filePath);
-}
-
-
-async function writeFeesToFile(data: any[], currentYear: number, outputDirPath: string) {
-  if (!data.length) return;
-  const filePath: string = `${outputDirPath}/alpaca-fees-${currentYear}.csv`;
-  data.unshift(['Description', 'Gross Amount']);
-  await writeCsvFile(data, filePath);
-}
-
-
-async function writeCsvFile(data: any[], filePath: string) {
-  const csvContent = data.map((row) => row.join(',')).join('\n');
-  await fs.writeFile(filePath, csvContent, 'utf-8');
-}
-
-
-export async function writeDataToFile(txData: any[], feeData: any[], currentYear: number, outputDirPath: string) {
-  await Promise.all([
-    writeTrxsToFile(txData, currentYear, outputDirPath),
-    writeFeesToFile(feeData, currentYear, outputDirPath)
-  ]);
-}
-
-
-export function getYearFromFile(filename: string): number {
-  return Number(filename.substring(0, 4));
+export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): ClosingTradeTy {
+  const buyValue: number = buyTrade.price * buyTrade.quantity;
+  const sellValue: number = sellTrade.price * sellTrade.quantity;
+  return {
+    symbol: buyTrade.symbol,
+    buy_qty: buyTrade.quantity,
+    sell_qty: sellTrade.quantity,
+    buy_process_date: buyTrade.process_date,
+    sell_process_date: sellTrade.process_date,
+    buy_price: buyTrade.price,
+    sell_price: sellTrade.price,
+    profit: round(sellValue - buyValue),
+    profit_pct: pctDiff(sellValue, buyValue)
+  };
 }
 
 
@@ -130,11 +27,124 @@ export function deepCopy(data: any): any {
 }
 
 
-export function parseArgs(args: any): ArgumenTy {
-  if (typeof args !== 'object') throw new Error('Provided argument is not valid');
-  if (!args.inputDirPath) args.inputDirPath = String(process.env.INPUTS);
-  if (!args.outputDirPath) args.outputDirPath = String(process.env.OUTPUTS);
-  if (args.writeToFile === undefined) args.writeToFile = true;
-  if (args.callbackFn === undefined) args.callbackFn = null;
-  return args;
+function getDollarVal(val: number): string {
+  return val > 0 ? `$${val}` : `-$${Math.abs(val)}`;
+};
+
+
+function convertToNumber(value: string): number {
+  // Remove currency symbols and parentheses
+  let cleanedValue = value.replace(/[\$,()]/g, '');
+  // Convert cleaned value to a number
+  return parseFloat(cleanedValue);
+}
+
+
+export async function parseCSV(filePath: string): Promise<HoodTradeTy []> {
+  return new Promise((resolve, reject) => {
+    const results: HoodTradeTy [] = [];
+    fs.createReadStream(filePath)
+      .pipe(csv())
+      .on('data', (data) => {
+        const row: HoodTradeTy  = {
+          activity_date: data['Activity Date'],
+          process_date: data['Process Date'],
+          settle_date: data['Settle Date'],
+          symbol: data['Instrument'],
+          description: data['Description'],
+          trans_code: data['Trans Code'],
+          quantity: convertToNumber(data['Quantity'] || ''),
+          price: convertToNumber(data['Price'] || ''),
+          amount: convertToNumber(data['Amount'] || '')
+        };
+        results.push(row);
+      })
+      .on('end', () => {
+        resolve(results);
+      })
+      .on('error', (error: any) => {
+        reject(error);
+      });
+  });
+}
+
+
+function convertDateToMilliseconds(dateStr: string): number {
+  const [month, day, year] = dateStr.split('/').map(Number);
+  const date = new Date(year, month - 1, day);
+  // Get the time in milliseconds since the Unix epoch
+  const milliseconds = date.getTime();
+  return milliseconds;
+}
+
+
+export function filterRowsByTransCode(rows: HoodTradeTy []): HoodTradeTy [] {
+  const filteredRows = rows.filter(row => row.trans_code === 'Sell' || row.trans_code === 'Buy');
+  // Sort filtered rows by process_date
+  const sortedRows: HoodTradeTy[] = filteredRows.reverse().sort((a, b) => {
+    const dateA = convertDateToMilliseconds(a.process_date);
+    const dateB = convertDateToMilliseconds(b.process_date);
+    return dateA - dateB;
+  });
+  return sortedRows;
+}
+
+
+export function printTable(trades: ClosingTradeTy[]): void {
+  // Define the table headers
+  const headers = ['Symbol', 'Qty', 'Sell Price', 'Sold At', 'Profit $', 'Profit %'];
+  const headerRow = headers.map(header => header.padEnd(11)).join(' | ');
+  const separator = headers.map(() => '-----------').join('-|-');
+
+  console.log(headerRow);
+  console.log(separator);
+
+  trades.forEach(trade => {
+    const rowString = [
+      trade.symbol.padEnd(11),
+      trade.sell_qty.toString().padEnd(11),
+      getDollarVal(trade.sell_price).padEnd(11),
+      trade.sell_process_date.padEnd(11),
+      getDollarVal(trade.profit).padEnd(11),
+      `${trade.profit_pct.toString()}%`.padEnd(11)
+    ].join(' | ');
+    console.log(rowString);
+  });
+}
+
+
+export function calculateTotalProfit(trades: ClosingTradeTy[]): TotalProfitResultTy {
+  let totalProfit = 0;
+  let totalProfitPct = 0;
+
+  trades.forEach(trade => {
+    totalProfit += trade.profit;
+    totalProfitPct += trade.profit_pct;
+  });
+
+  return {
+    total_profit: round(totalProfit),
+    total_profit_pct: round(totalProfitPct)
+  };
+}
+
+
+function printWithDots(value1: string, value2: string): void {
+  const totalLength = 80;
+  const totalValuesLength = value1.length + value2.length;
+  const totalDots = totalLength - totalValuesLength;
+  /*
+  if (totalDots < 0) {
+    console.error('The combined length of the values exceeds the total line length.');
+    return;
+  }
+  */
+  const line = `${value1} ${'-'.repeat(totalDots)} ${value2}`;
+  console.log(line);
+}
+
+
+export function printTotalProfit(profit: TotalProfitResultTy): void {
+  printWithDots('Total Profit ($)', getDollarVal(profit.total_profit));
+  printWithDots('Total Profit (%)', `${profit.total_profit_pct}%`);
 }
