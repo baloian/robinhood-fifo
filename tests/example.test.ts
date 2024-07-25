@@ -1,7 +1,4 @@
-import { RobinhoodFIFO } from '../robinhood-fifo';
-
-const inputDirPath: string = 'INPUTS';
-const outputDirPath: string = 'OUTPUTS';
+import RobinhoodFIFO from '../robinhood-fifo';
 
 test('Testing buying and selling X amount of a specific stock', async () => {
   // await RobinhoodFIFO.run(inputDirPath, outputDirPath, false, () => {});
