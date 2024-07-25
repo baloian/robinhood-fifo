@@ -27,9 +27,12 @@ export function deepCopy(data: any): any {
 }
 
 
-function getDollarVal(val: number): string {
-  return val > 0 ? `$${val}` : `-$${Math.abs(val)}`;
-};
+function formatToUSD(amount: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(amount);
+}
 
 
 function convertToNumber(value: string): number {
@@ -103,9 +106,9 @@ export function printTable(trades: ClosingTradeTy[]): void {
     const rowString = [
       trade.symbol.padEnd(11),
       trade.sell_qty.toString().padEnd(11),
-      getDollarVal(trade.sell_price).padEnd(11),
+      formatToUSD(trade.sell_price).padEnd(11),
       trade.sell_process_date.padEnd(11),
-      getDollarVal(trade.profit).padEnd(11),
+      formatToUSD(trade.profit).padEnd(11),
       `${trade.profit_pct.toString()}%`.padEnd(11)
     ].join(' | ');
     console.log(rowString);
@@ -126,7 +129,7 @@ export function printSummary(trades: HoodTradeTy[]): void {
     const rowString = [
       trade.symbol.padEnd(12),
       trade.quantity.toString().padEnd(12),
-      getDollarVal(trade.amount).padEnd(12),
+      formatToUSD(trade.amount).padEnd(12),
       trade.process_date.padEnd(12)
     ].join(' | ');
     console.log(rowString);
@@ -166,6 +169,6 @@ export function printWithDots(value1: string, value2: string, symbol: string = '
 
 
 export function printTotalProfit(profit: TotalProfitResultTy): void {
-  printWithDots('Total Profit ($)', getDollarVal(profit.total_profit));
+  printWithDots('Total Profit ($)', formatToUSD(profit.total_profit));
   printWithDots('Total Profit (%)', `${profit.total_profit_pct}%`);
 }
