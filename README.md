@@ -1,10 +1,10 @@
 # Robinhood Gain/Loss Calculator
 This TypeScript library provides functionality to calculate [Robinhood](https://robinhood.com/)
-trading gains or losses based on FIFO using individual reports as inputs. We do this because Robinhood
-does not provide gains and losses in the monthly statements.
+trading gains or losses using reports as input. We do this because Robinhood does not provide
+gains and losses in the monthly statements.
 
 **IMPORTANT:** The `robinhood-fifo` project DOES NOT generate tax forms of any kind. It helps you calculate gains
-and losses in FIFO mode.
+and losses.
 
 
 ## Build
@@ -32,7 +32,7 @@ npm run start
 
 ## Contributions
 Contributions are welcome and can be made by submitting GitHub pull requests
-to this repository. In general, the `MarCal` source code follows
+to this repository. In general, the project source code follows
 [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript) and the
 rules specified in `.eslintrc.json` file.
 
