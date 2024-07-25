@@ -143,17 +143,19 @@ export function printSummary(trades: HoodTradeTy[]): void {
 
 
 export function calculateTotalProfit(trades: ClosingTradeTy[]): TotalProfitResultTy {
-  let totalProfit = 0;
-  let totalProfitPct = 0;
-
+  let total_profit: number = 0;
+  let total_profit_pct: number = 0;
   trades.forEach(trade => {
-    totalProfit += trade.profit;
-    totalProfitPct += trade.profit_pct;
+    const { profit, profit_pct } = trade;
+    total_profit += profit;
+    const currentProfitFactor = 1 + profit_pct / 100;
+    const totalProfitFactor = 1 + total_profit_pct / 100;
+    const newTotalProfitFactor = totalProfitFactor * currentProfitFactor;
+    total_profit_pct = (newTotalProfitFactor - 1) * 100;
   });
-
   return {
-    total_profit: round(totalProfit),
-    total_profit_pct: round(totalProfitPct)
+    total_profit: round(total_profit),
+    total_profit_pct: round(total_profit_pct)
   };
 }
 
@@ -194,7 +196,8 @@ export function calculateSymbolProfits(trades: ClosingTradeTy[]): SymbolProfitTy
       symbolProfits[symbol] = { total_profit: 0, total_profit_pct: 0 };
     }
     symbolProfits[symbol].total_profit += profit;
-    symbolProfits[symbol].total_profit_pct += profit_pct;
+    symbolProfits[symbol].total_profit_pct = (1 + symbolProfits[symbol].total_profit_pct / 100) * (1 + profit_pct / 100) - 1;
+    symbolProfits[symbol].total_profit_pct *= 100;
   });
   return Object.keys(symbolProfits).map(symbol => ({
     symbol,
