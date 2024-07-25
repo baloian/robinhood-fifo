@@ -1,10 +1,12 @@
-import { round, timeDiff } from '@baloian/lib';
+import { round, pctDiff} from '@baloian/lib';
 import fs from 'fs';
 import csv from 'csv-parser';
 import { HoodTradeTy, ClosingTradeTy } from './types';
 
 
 export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): ClosingTradeTy {
+  const buyValue: number = buyTrade.price * buyTrade.quantity;
+  const sellValue: number = sellTrade.price * sellTrade.quantity;
   return {
     symbol: buyTrade.symbol,
     buy_qty: buyTrade.quantity,
@@ -12,7 +14,9 @@ export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): C
     buy_process_date: buyTrade.process_date,
     sell_process_date: sellTrade.process_date,
     buy_price: buyTrade.price,
-    sell_price: sellTrade.price
+    sell_price: sellTrade.price,
+    profit: round(sellValue - buyValue),
+    profit_pct: pctDiff(sellValue, buyValue)
   };
 }
 

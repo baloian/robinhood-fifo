@@ -28,9 +28,9 @@ export class RobinhoodFIFO {
       // console.log(trades);
       for (const trade of trades) {
         if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
-        // else this.processSellTrade(trade);
+        else this.processSellTrade(trade);
       }
-      console.log(this.gQueue.MSFT);
+      console.log(this.txsData);
     } catch (error) {
       console.error(error);
     }

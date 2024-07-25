@@ -19,4 +19,6 @@ export interface ClosingTradeTy {
   sell_process_date: string;
   buy_price: number;
   sell_price: number;
+  profit: number;
+  profit_pct: number;
 };
