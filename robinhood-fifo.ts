@@ -122,7 +122,7 @@ export class RobinhoodFIFO {
     }
     console.log('');
     console.log('');
-    printWithDots('*** Portfolio Summary', '', '*');
+    printWithDots('*** Portfolio Summary (Current State)', '', '*');
     console.log('');
     Object.entries(this.gQueue).forEach(([symbol, queue]) => {
       if (!queue.isEmpty()) printSummary(queue.getList());
