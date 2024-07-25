@@ -10,7 +10,8 @@ import {
   getTradeRecord,
   printTable,
   calculateTotalProfit,
-  printTotalProfit
+  printTotalProfit,
+  printWithDots
 } from './utils';
 
 
@@ -91,10 +92,20 @@ export class RobinhoodFIFO {
   }
 
   private printResults(): void {
-    printTable(this.txsData);
+    if (this.txsData.length) {
+      console.log('');
+      printWithDots('... Account Activity', '', '.');
+      console.log('');
+      printTable(this.txsData);
+      console.log('');
+      console.log('');
+      printWithDots('... Total Gain/Loss', '', '.');
+      console.log('');
+      const totalProfitRes: TotalProfitResultTy = calculateTotalProfit(this.txsData);
+      printTotalProfit(totalProfitRes);
+    }
     console.log('');
-    const totalProfitRes: TotalProfitResultTy = calculateTotalProfit(this.txsData);
-    printTotalProfit(totalProfitRes);
+    printWithDots('... Portfolio Summary', '', '.');
   }
 }
 

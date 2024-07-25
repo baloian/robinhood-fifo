@@ -129,8 +129,8 @@ export function calculateTotalProfit(trades: ClosingTradeTy[]): TotalProfitResul
 }
 
 
-function printWithDots(value1: string, value2: string): void {
-  const totalLength = 80;
+export function printWithDots(value1: string, value2: string, symbol: string = '-'): void {
+  const totalLength = 78;
   const totalValuesLength = value1.length + value2.length;
   const totalDots = totalLength - totalValuesLength;
   /*
@@ -139,7 +139,7 @@ function printWithDots(value1: string, value2: string): void {
     return;
   }
   */
-  const line = `${value1} ${'-'.repeat(totalDots)} ${value2}`;
+  const line: string = `${value1} ${symbol.repeat(totalDots)}` + (value2.length > 0 ? ` ${value2}` : symbol);
   console.log(line);
 }
 
