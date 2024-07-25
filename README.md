@@ -1,34 +1,27 @@
-# Alpaca FIFO
-This TypeScript library provides functionality to calculate [Alpaca Markets](https://alpaca.markets/)
-trading gains or losses based on FIFO using Alpaca `<YYYYMMDD>.json` reports as inputs. We do this because
-Alpaca no longer supports FIFO.
+# Robinhood Gain/Loss Calculator
+This TypeScript library provides functionality to calculate [Robinhood](https://robinhood.com/)
+trading gains or losses based on FIFO using individual reports as inputs. We do this because Robinhood
+does not provide gains and losses in the monthly statements.
 
-**IMPORTANT:** The `alpaca-fifo` project DOES NOT generate tax forms of any kind. It helps you calculate gains
-and losses in FIFO mode for your taxes.
+**IMPORTANT:** The `robinhood-fifo` project DOES NOT generate tax forms of any kind. It helps you calculate gains
+and losses in FIFO mode.
 
 
 ## Build
 ```bash
-git clone git@github.com:baloian/alpaca-fifo.git
-cd alpaca-fifo
+git clone git@github.com:baloian/robinhood-fifo.git
+cd robinhood-fifo
 npm install
 ```
 
+
 ## Setup
 #### STEP 1:
-Create two directories, one for input (e.g. `INPUTS`) and the other for outputs (e.g. `OUTPUTS`).
+Generate your individual report in your Robinhood account and download the generated `.csv` file.
 
 #### STEP 2:
-Download all the Alpaca `<YYYYMMDD>.json` files from your account documents and place them in the `INPUTS` folder.
-Please do not edit the filenames or their contents. Otherwise, the result will be incorrect.
+Put the `.csv` file in the project's root directory and rename it to `robinhood.csv`.
 
-
-#### STEP 3:
-You need to set up environment variables by creating a `.env` file in the root directory and providing the following variables:
-```bash
-INPUTS=<absolute path of the inputs directory>
-OUTPUTS=<Absolute path of the outputs directory>
-```
 
 ## Run
 In the root directory, execute the following command
@@ -36,41 +29,6 @@ In the root directory, execute the following command
 npm run start
 ```
 
-## Output Results
-If running the project went successfully, then in the `OUTPUTS` directory, you should see `alpaca-fifo-<YYYY>.csv`
-and `alpaca-fees-<YYYY>.csv` files for each year. 
-
-
-## Use as a Dependency Library
-You can use the project asa  dependency lib of your project.
-
-#### Install
-```bash
-npm install github:baloian/alpaca-fifo
-```
-
-#### Usage
-Create an `inputs` and `outputs` directories and upload all the `<YYYYMMDD>.json` files without any modifications in the `inputs` directory.
-```typescript
-import { AlpacaFIFO } from 'alpaca-fifo';
-
-(async () => {
-  const alpacaFIFO = new AlpacaFIFO();
-  await alpacaFIFO.run({
-    inputDirPath: '<absolute path of the directory>',
-    outputDirPath: '<absolute path of the directory>'
-  });
-})();
-```
-The `run()` method takes an argument object with the following properties:
-```typescript
-{
-  inputDirPath:  <string>,   // absolute path of the directory>',
-  outputDirPath: <string>,   // <absolute path of the directory>'
-  writeToFile:   <boolean>,  // True if you want to write data to a .csv file. Default is true
-  callbackFn:    <function>  // Callback function. callback(txsData, feeData, year). Default is null
-}
-```
 
 ## Contributions
 Contributions are welcome and can be made by submitting GitHub pull requests
