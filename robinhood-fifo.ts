@@ -3,13 +3,15 @@ import * as path from 'path';
 import { round } from '@baloian/lib';
 import Queue from './queue';
 import Validator from './validator';
-import { HoodTradeTy, ClosingTradeTy } from './types';
+import { HoodTradeTy, ClosingTradeTy, TotalProfitResultTy } from './types';
 import {
   deepCopy,
   parseCSV,
   filterRowsByTransCode,
   getTradeRecord,
-  printTable
+  printTable,
+  calculateTotalProfit,
+  printTotalProfit
 } from './utils';
 
 
@@ -31,6 +33,9 @@ export class RobinhoodFIFO {
         else this.processSellTrade(trade);
       }
       printTable(this.txsData);
+      console.log('');
+      const totalProfitRes: TotalProfitResultTy = calculateTotalProfit(this.txsData);
+      printTotalProfit(totalProfitRes);
     } catch (error) {
       console.error(error);
     }

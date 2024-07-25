@@ -1,7 +1,7 @@
 import { round, pctDiff} from '@baloian/lib';
 import fs from 'fs';
 import csv from 'csv-parser';
-import { HoodTradeTy, ClosingTradeTy } from './types';
+import { HoodTradeTy, ClosingTradeTy, TotalProfitResultTy } from './types';
 
 
 export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): ClosingTradeTy {
@@ -110,4 +110,41 @@ export function printTable(trades: ClosingTradeTy[]): void {
     ].join(' | ');
     console.log(rowString);
   });
+}
+
+
+export function calculateTotalProfit(trades: ClosingTradeTy[]): TotalProfitResultTy {
+  let totalProfit = 0;
+  let totalProfitPct = 0;
+
+  trades.forEach(trade => {
+    totalProfit += trade.profit;
+    totalProfitPct += trade.profit_pct;
+  });
+
+  return {
+    total_profit: round(totalProfit),
+    total_profit_pct: round(totalProfitPct)
+  };
+}
+
+
+function printWithDots(value1: string, value2: string): void {
+  const totalLength = 80;
+  const totalValuesLength = value1.length + value2.length;
+  const totalDots = totalLength - totalValuesLength;
+  /*
+  if (totalDots < 0) {
+    console.error('The combined length of the values exceeds the total line length.');
+    return;
+  }
+  */
+  const line = `${value1} ${'-'.repeat(totalDots)} ${value2}`;
+  console.log(line);
+}
+
+
+export function printTotalProfit(profit: TotalProfitResultTy): void {
+  printWithDots('Total Profit ($)', getDollarVal(profit.total_profit));
+  printWithDots('Total Profit (%)', `${profit.total_profit_pct}%`);
 }

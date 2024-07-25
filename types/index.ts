@@ -22,3 +22,9 @@ export interface ClosingTradeTy {
   profit: number;
   profit_pct: number;
 };
+
+
+export interface TotalProfitResultTy {
+  total_profit: number;
+  total_profit_pct: number;
+};
