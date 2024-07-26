@@ -25,13 +25,10 @@ import {
 export default class RobinhoodFIFO {
   // This is a variable where I keep orders for every symbol in a queue.
   private gQueue: {[key: string]: any} = {};
-  // These are variables where I keep data for writing in a CSV file.
   private txsData: ClosingTradeTy[] = [];
-  private feeData: string[] = [];
 
   async run(): Promise<void> {
     try {
-      this.reset();
       const filePath = path.resolve(__dirname, '../robinhood.csv');
       const rows: HoodTradeTy[] = await parseCSV(filePath);
       const trades = filterRowsByTransCode(rows);
@@ -97,12 +94,6 @@ export default class RobinhoodFIFO {
       buyTrade.amount = round(buyTrade.quantity * buyTrade.price);
       symbolQueue.updateFront(buyTrade);
     }
-  }
-
-  private reset(): void {
-    this.gQueue = {};
-    this.txsData = [];
-    this.feeData = [];
   }
 
   private printResults(): void {
