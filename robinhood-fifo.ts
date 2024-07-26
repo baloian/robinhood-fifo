@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { round } from '@baloian/lib';
+import { round, deepCopy } from '@baloian/lib';
 import Queue from './queue';
 import Validator from './validator';
 import {
@@ -8,7 +8,6 @@ import {
   TotalProfitResultTy
 } from './types';
 import {
-  deepCopy,
   parseCSV,
   filterRowsByTransCode,
   getTradeRecord,

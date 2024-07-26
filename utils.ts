@@ -1,4 +1,4 @@
-import { round, pctDiff} from '@baloian/lib';
+import { round, pctDiff, formatToUSD } from '@baloian/lib';
 import fs from 'fs';
 import csv from 'csv-parser';
 import {
@@ -23,20 +23,6 @@ export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): C
     profit: round(sellValue - buyValue),
     profit_pct: pctDiff(sellValue, buyValue)
   };
-}
-
-
-export function deepCopy(data: any): any {
-  if (data) return JSON.parse(JSON.stringify(data));
-  return data;
-}
-
-
-function formatToUSD(amount: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
 }
 
 
