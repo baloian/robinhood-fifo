@@ -84,6 +84,26 @@ export function filterRowsByTransCode(rows: HoodTradeTy []): HoodTradeTy [] {
 }
 
 
+export function getTotalFees(rows: HoodTradeTy []): number {
+  return rows.reduce((total, row) => {
+    if (row.trans_code === 'GOLD' || row.trans_code === 'MINT') {
+      return total + row.amount;
+    }
+    return total;
+  }, 0);
+}
+
+
+export function getTotalDividends(rows: HoodTradeTy []): number {
+  return rows.reduce((total, row) => {
+    if (row.trans_code === 'CDIV') {
+      return total + row.amount;
+    }
+    return total;
+  }, 0);
+}
+
+
 export function printTable(trades: ClosingTradeTy[]): void {
   // Define the table headers
   const headers = ['Symbol', 'Qty', 'Sell Price', 'Sold At', 'Profit $', 'Profit %'];
@@ -161,9 +181,9 @@ export function printWithDots(value1: string, value2: string, symbol: string = '
 }
 
 
-export function printTotalProfit(profit: TotalProfitResultTy): void {
-  printWithDots('Total Profit ($)', formatToUSD(profit.total_profit));
-  printWithDots('Total Profit (%)', `${profit.total_profit_pct}%`);
+export function printTotalGainLoss(profit: TotalProfitResultTy): void {
+  printWithDots('Total Gain/Loss ($)', formatToUSD(profit.total_profit));
+  printWithDots('Total Gain/Loss (%)', `${profit.total_profit_pct}%`);
 }
 
 

@@ -13,11 +13,13 @@ import {
   getTradeRecord,
   printTable,
   calculateTotalProfit,
-  printTotalProfit,
+  printTotalGainLoss,
   printWithDots,
   printSummary,
   calculateSymbolProfits,
-  printSymbolTotalProfit
+  printSymbolTotalProfit,
+  getTotalFees,
+  getTotalDividends
 } from './utils';
 
 
@@ -25,6 +27,8 @@ export default class RobinhoodFIFO {
   // This is a variable where I keep orders for every symbol in a queue.
   private gQueue: {[key: string]: any} = {};
   private txsData: ClosingTradeTy[] = [];
+  private totalFees: number = 0;
+  private totalDividends: number = 0;
 
   async run(): Promise<void> {
     try {
@@ -35,6 +39,8 @@ export default class RobinhoodFIFO {
         if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
         else this.processSellTrade(trade);
       }
+      this.totalFees = getTotalFees(rows);
+      this.totalDividends = getTotalDividends(rows);
       this.printResults();
     } catch (error) {
       console.error(error);
@@ -106,10 +112,16 @@ export default class RobinhoodFIFO {
       printWithDots('*** Total Gain/Loss', '', '*');
       console.log('');
       const totalProfitRes: TotalProfitResultTy = calculateTotalProfit(this.txsData);
-      printTotalProfit(totalProfitRes);
+      printTotalGainLoss(totalProfitRes);
       const symbolProfits = calculateSymbolProfits(this.txsData);
       console.log('');
       printSymbolTotalProfit(symbolProfits);
+      console.log('');
+      console.log('');
+      printWithDots('*** Total Fees & Dividends', '', '*');
+      console.log('');
+      printWithDots('Total Fees ($)', `$${this.totalFees}`);
+      printWithDots('Total Dividends ($)', `$${this.totalDividends}`);
     }
     console.log('');
     console.log('');
