@@ -28,7 +28,7 @@ export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): C
 
 function convertToNumber(value: string): number {
   // Remove currency symbols and parentheses
-  let cleanedValue = value.replace(/[\$,()]/g, '');
+  const cleanedValue = value.replace(/[\$,()]/g, '');
   // Convert cleaned value to a number
   return parseFloat(cleanedValue);
 }
@@ -176,7 +176,8 @@ export function printWithDots(value1: string, value2: string, symbol: string = '
     return;
   }
   */
-  const line: string = `${value1} ${symbol.repeat(totalDots)}` + (value2.length > 0 ? ` ${value2}` : symbol);
+  const line: string = `${value1} ${symbol.repeat(totalDots)}` +
+    (value2.length > 0 ? ` ${value2}` : symbol);
   console.log(line);
 }
 
@@ -202,11 +203,12 @@ export function calculateSymbolProfits(trades: ClosingTradeTy[]): SymbolProfitTy
       symbolProfits[symbol] = { total_profit: 0, total_profit_pct: 0 };
     }
     symbolProfits[symbol].total_profit += profit;
-    symbolProfits[symbol].total_profit_pct = (1 + symbolProfits[symbol].total_profit_pct / 100) * (1 + profit_pct / 100) - 1;
+    symbolProfits[symbol].total_profit_pct =
+      (1 + symbolProfits[symbol].total_profit_pct / 100) * (1 + profit_pct / 100) - 1;
     symbolProfits[symbol].total_profit_pct *= 100;
   });
   return Object.keys(symbolProfits).map(symbol => ({
-    symbol,
+    symbol: symbol,
     total_profit: round(symbolProfits[symbol].total_profit),
     total_profit_pct: round(symbolProfits[symbol].total_profit_pct)
   }));

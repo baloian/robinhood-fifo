@@ -1,5 +1,5 @@
 {
-    "extends": ["airbnb-base"],
+    "extends": ["plugin:@typescript-eslint/recommended"],
     "parser": "babel-eslint",
     "overrides": [{
       "files": ["**/*.ts"],
