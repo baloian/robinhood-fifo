@@ -120,8 +120,8 @@ export default class RobinhoodFIFO {
       console.log('');
       printWithDots('*** Total Fees & Dividends', '', '*');
       console.log('');
-      printWithDots('Total Fees ($)', `$${this.totalFees}`);
-      printWithDots('Total Dividends ($)', `$${this.totalDividends}`);
+      printWithDots('Total Fees', `$${this.totalFees}`);
+      printWithDots('Total Dividends', `$${this.totalDividends}`);
     }
     console.log('');
     console.log('');
