@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { round, deepCopy } from '@baloian/lib';
-import Queue from './queue';
+import { Queue, QueueType } from './queue';
 import Validator from './validator';
 import {
   HoodTradeTy,
@@ -25,7 +25,7 @@ import {
 
 export default class RobinhoodFIFO {
   // This is a variable where I keep orders for every symbol in a queue.
-  private gQueue: {[key: string]: any} = {};
+  private gQueue: {[key: string]: QueueType<HoodTradeTy>} = {};
   private txsData: ClosingTradeTy[] = [];
   private totalData: TotalDataTy = {
     fees: 0,
@@ -64,7 +64,8 @@ export default class RobinhoodFIFO {
       return;
     }
     const symbolQueue = this.gQueue[sellTrade.symbol];
-    const buyTrade: HoodTradeTy = symbolQueue.front();
+    const buyTrade: HoodTradeTy | undefined = symbolQueue.front();
+    if (!buyTrade) return;
     if (buyTrade.quantity - sellTrade.quantity === 0 || buyTrade.quantity - sellTrade.quantity > 0) {
       this.sellFullOrPartially(buyTrade, sellTrade);
     } else {
@@ -73,14 +74,16 @@ export default class RobinhoodFIFO {
       // In this case, the current buying order is the 5 AAPL. I would need to sell 2 more
       // AAPL from the 4 AAPL buy.
       while (sellTrade.quantity > 0) {
-        const tmpBuyTrade: HoodTradeTy = symbolQueue.front();
-        const tmpSellTrade: HoodTradeTy = deepCopy(sellTrade);
-        tmpSellTrade.quantity = sellTrade.quantity >= tmpBuyTrade.quantity ?
-          tmpBuyTrade.quantity : sellTrade.quantity;
-        tmpSellTrade.amount = round(tmpSellTrade.quantity * tmpSellTrade.price);
-        this.sellFullOrPartially(tmpBuyTrade, tmpSellTrade);
-        sellTrade.quantity -= tmpSellTrade.quantity;
-        sellTrade.amount = round(sellTrade.quantity * sellTrade.price);
+        const tmpBuyTrade: HoodTradeTy | undefined = symbolQueue.front();
+        if (tmpBuyTrade) {
+          const tmpSellTrade: HoodTradeTy = deepCopy(sellTrade);
+          tmpSellTrade.quantity = sellTrade.quantity >= tmpBuyTrade.quantity ?
+            tmpBuyTrade.quantity : sellTrade.quantity;
+          tmpSellTrade.amount = round(tmpSellTrade.quantity * tmpSellTrade.price);
+          this.sellFullOrPartially(tmpBuyTrade, tmpSellTrade);
+          sellTrade.quantity -= tmpSellTrade.quantity;
+          sellTrade.amount = round(sellTrade.quantity * sellTrade.price);
+        }
       }
     }
   }
@@ -90,7 +93,7 @@ export default class RobinhoodFIFO {
   private sellFullOrPartially(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): void {
     const symbolQueue = this.gQueue[sellTrade.symbol];
     if (buyTrade.quantity - sellTrade.quantity === 0) {
-      this.txsData.push(getTradeRecord(buyTrade, sellTrade) as any);
+      this.txsData.push(getTradeRecord(buyTrade, sellTrade));
       symbolQueue.pop();
     } else if (buyTrade.quantity - sellTrade.quantity > 0) {
       const tmpBuyTrade: HoodTradeTy = deepCopy(buyTrade);
@@ -113,7 +116,7 @@ export default class RobinhoodFIFO {
       console.log('');
       console.log('');
       printWithDots('*** Total Gain/Loss', '', '*');
-      console.log('');
+      console.log('***');
       const totalProfitRes: TotalProfitResultTy = calculateTotalProfit(this.txsData);
       printTotalGainLoss(totalProfitRes);
       const symbolProfits = calculateSymbolProfits(this.txsData);
@@ -122,14 +125,20 @@ export default class RobinhoodFIFO {
       console.log('');
       console.log('');
       printWithDots('*** Total Fees & Dividends', '', '*');
+      console.log('***');
+      printWithDots('Fees', `$${this.totalData.fees}`);
+      printWithDots('Dividends', `$${this.totalData.dividends}`);
       console.log('');
-      printWithDots('Total Fees', `$${this.totalData.fees}`);
-      printWithDots('Total Dividends', `$${this.totalData.dividends}`);
+      console.log('');
+      printWithDots('*** Total Deposit & Withdrawal', '', '*');
+      console.log('***');
+      printWithDots('Deposit', `$${this.totalData.deposit}`);
+      printWithDots('Withdrawal', `$${this.totalData.withdrawal}`);
     }
     console.log('');
     console.log('');
     printWithDots('*** Portfolio Summary (Current State)', '', '*');
-    console.log('');
+    console.log('***');
     Object.entries(this.gQueue).forEach(([symbol, queue]) => {
       if (!queue.isEmpty()) printSummary(queue.getList());
     });

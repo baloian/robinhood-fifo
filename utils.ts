@@ -95,6 +95,10 @@ export function getTotalData(rows: HoodTradeTy []): TotalDataTy {
   rows.forEach((row: HoodTradeTy) => {
     if (row.trans_code === 'GOLD' || row.trans_code === 'MINT') data.fees += row.amount;
     if (row.trans_code === 'CDIV') data.dividends += row.amount;
+    if (row.trans_code === 'ACH') {
+      if (row.description === 'ACH Deposit') data.deposit += row.amount;
+      if (row.description === 'ACH Withdrawal') data.withdrawal += row.amount;
+    }
   });
   return data;
 }
@@ -179,8 +183,8 @@ export function printWithDots(value1: string, value2: string, symbol: string = '
 
 
 export function printTotalGainLoss(profit: TotalProfitResultTy): void {
-  printWithDots('Total Gain/Loss ($)', formatToUSD(profit.total_profit));
-  printWithDots('Total Gain/Loss (%)', `${profit.total_profit_pct}%`);
+  printWithDots('Gain/Loss ($)', formatToUSD(profit.total_profit));
+  printWithDots('Gain/Loss (%)', `${profit.total_profit_pct}%`);
 }
 
 

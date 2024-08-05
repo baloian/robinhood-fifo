@@ -1,4 +1,17 @@
-export default class Queue<T> {
+export interface QueueType<T> {
+  push(item: T): void;
+  pop(): void;
+  front(): T | undefined;
+  isEmpty(): boolean;
+  size(): number;
+  clear(): void;
+  updateFront(data: T): void;
+  totalQty(): number;
+  getList(): T[];
+}
+
+
+export class Queue<T> implements QueueType<T> {
   private items: T[] = [];
 
   push(item: T): void {
