@@ -213,3 +213,10 @@ export function calculateSymbolProfits(trades: ClosingTradeTy[]): SymbolProfitTy
     total_profit_pct: round(symbolProfits[symbol].total_profit_pct)
   }));
 }
+
+
+export function getTotalQty(items: HoodTradeTy[]): number {
+  let total: number = 0;
+  items.forEach((e: any) => total += e.qty);
+  return total;
+}
