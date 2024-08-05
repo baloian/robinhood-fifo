@@ -35,3 +35,11 @@ export interface SymbolProfitTy {
   total_profit: number;
   total_profit_pct: number;
 };
+
+
+export interface TotalDataTy {
+  fees: number;
+  dividends: number;
+  deposit: number;
+  withdrawal: number;
+}

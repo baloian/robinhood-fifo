@@ -5,7 +5,8 @@ import {
   HoodTradeTy,
   ClosingTradeTy,
   TotalProfitResultTy,
-  SymbolProfitTy
+  SymbolProfitTy,
+  TotalDataTy
 } from './types';
 
 
@@ -84,23 +85,18 @@ export function filterRowsByTransCode(rows: HoodTradeTy []): HoodTradeTy [] {
 }
 
 
-export function getTotalFees(rows: HoodTradeTy []): number {
-  return rows.reduce((total, row) => {
-    if (row.trans_code === 'GOLD' || row.trans_code === 'MINT') {
-      return total + row.amount;
-    }
-    return total;
-  }, 0);
-}
-
-
-export function getTotalDividends(rows: HoodTradeTy []): number {
-  return rows.reduce((total, row) => {
-    if (row.trans_code === 'CDIV') {
-      return total + row.amount;
-    }
-    return total;
-  }, 0);
+export function getTotalData(rows: HoodTradeTy []): TotalDataTy {
+  const data: TotalDataTy = {
+    fees: 0,
+    dividends: 0,
+    deposit: 0,
+    withdrawal: 0
+  };
+  rows.forEach((row: HoodTradeTy) => {
+    if (row.trans_code === 'GOLD' || row.trans_code === 'MINT') data.fees += row.amount;
+    if (row.trans_code === 'CDIV') data.dividends += row.amount;
+  });
+  return data;
 }
 
 

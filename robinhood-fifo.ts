@@ -5,7 +5,8 @@ import Validator from './validator';
 import {
   HoodTradeTy,
   ClosingTradeTy,
-  TotalProfitResultTy
+  TotalProfitResultTy,
+  TotalDataTy
 } from './types';
 import {
   parseCSV,
@@ -18,8 +19,7 @@ import {
   printSummary,
   calculateSymbolProfits,
   printSymbolTotalProfit,
-  getTotalFees,
-  getTotalDividends
+  getTotalData
 } from './utils';
 
 
@@ -27,8 +27,12 @@ export default class RobinhoodFIFO {
   // This is a variable where I keep orders for every symbol in a queue.
   private gQueue: {[key: string]: any} = {};
   private txsData: ClosingTradeTy[] = [];
-  private totalFees: number = 0;
-  private totalDividends: number = 0;
+  private totalData: TotalDataTy = {
+    fees: 0,
+    dividends: 0,
+    deposit: 0,
+    withdrawal: 0,
+  };
 
   async run(): Promise<void> {
     try {
@@ -39,8 +43,7 @@ export default class RobinhoodFIFO {
         if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
         else this.processSellTrade(trade);
       }
-      this.totalFees = getTotalFees(rows);
-      this.totalDividends = getTotalDividends(rows);
+      this.totalData = getTotalData(rows);
       this.printResults();
     } catch (error) {
       console.error(error);
@@ -120,8 +123,8 @@ export default class RobinhoodFIFO {
       console.log('');
       printWithDots('*** Total Fees & Dividends', '', '*');
       console.log('');
-      printWithDots('Total Fees', `$${this.totalFees}`);
-      printWithDots('Total Dividends', `$${this.totalDividends}`);
+      printWithDots('Total Fees', `$${this.totalData.fees}`);
+      printWithDots('Total Dividends', `$${this.totalData.dividends}`);
     }
     console.log('');
     console.log('');
