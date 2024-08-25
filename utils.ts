@@ -220,3 +220,13 @@ export function getTotalQty(items: HoodTradeTy[]): number {
   items.forEach((e: any) => total += e.qty);
   return total;
 }
+
+
+export async function getRawData(dirPath: string): Promise<HoodTradeTy []> {
+  let rows: HoodTradeTy[] = [];
+  const files = await fs.promises.readdir(dirPath);
+  for (const filename of files) {
+    rows = [...rows, ...await parseCSV(`${dirPath}/${filename}`)]
+  }
+  return rows;
+}

@@ -8,7 +8,6 @@ import {
   TotalDataTy
 } from './types';
 import {
-  parseCSV,
   filterRowsByTransCode,
   getTradeRecord,
   printTable,
@@ -18,7 +17,8 @@ import {
   printSummary,
   calculateSymbolProfits,
   printSymbolTotalProfit,
-  getTotalData
+  getTotalData,
+  getRawData
 } from './utils';
 
 
@@ -35,8 +35,7 @@ export default class RobinhoodFIFO {
 
   async run(): Promise<void> {
     try {
-      const filePath = path.resolve(__dirname, '../robinhood.csv');
-      const rows: HoodTradeTy[] = await parseCSV(filePath);
+      const rows: HoodTradeTy[] = await getRawData(path.resolve(__dirname, '../input'));
       const trades = filterRowsByTransCode(rows);
       for (const trade of trades) {
         if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
