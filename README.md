@@ -17,10 +17,10 @@ npm install
 
 ## Setup
 #### STEP 1:
-Generate your individual report in your Robinhood account and download the generated `.csv` file.
+Generate your individual report in your Robinhood account and download the generated `.csv` file(s).
 
 #### STEP 2:
-Put the `.csv` file in the project's root directory and rename it to `robinhood.csv`.
+Create an `input` directory in the project's root directory and place the downloaded `.csv` file(s) inside it.
 
 
 ## Run
