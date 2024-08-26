@@ -81,6 +81,9 @@ export default class RobinhoodFIFO {
           this.sellFullOrPartially(tmpBuyTrade, tmpSellTrade);
           sellTrade.quantity -= tmpSellTrade.quantity;
           sellTrade.amount = round(sellTrade.quantity * sellTrade.price);
+        } else {
+          console.error(sellTrade);
+          throw new Error('Oops! Something went wrong');
         }
       }
     }
