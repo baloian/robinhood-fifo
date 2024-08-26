@@ -19,7 +19,8 @@ import {
   printSymbolTotalProfit,
   getTotalData,
   getRawData,
-  getMonthYearData
+  getMonthYearData,
+  numberToMonth
 } from './utils';
 
 
@@ -37,36 +38,32 @@ export default class RobinhoodFIFO {
   async run(): Promise<void> {
     try {
       const rows: HoodTradeTy[] = await getRawData(path.resolve(__dirname, '../input'));
-      const trades = filterRowsByTransCode(rows);
-      for (const trade of trades) {
-        if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
-        else this.processSellTrade(trade);
-      }
-      this.totalData = getTotalData(rows);
-      this.printResults('Total');
-
+      this.processData(rows, 'Total');
       this.processMonthlyStmt(rows);
     } catch (error) {
       console.error(error);
     }
   }
 
+  private processData(rows: HoodTradeTy[], type: string): void {
+    const trades = filterRowsByTransCode(rows);
+    for (const trade of trades) {
+      if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
+      else this.processSellTrade(trade);
+    }
+    this.totalData = getTotalData(rows);
+    this.printResults(type);
+  }
+
   private processMonthlyStmt(rows: HoodTradeTy[]): void {
     const monthYearData: {[key: string]: HoodTradeTy[]} = getMonthYearData(rows);
-    console.log(monthYearData);
-    /*
-    this.reset();
-    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].forEach((m: number) => {
-      const trades = getTradesByMonth(rows, m);
-      if (trades.length) {
-        console.log(numberToMonth(m));
-        console.log(trades);
-        console.log('');
-      }
-      const month: string | null = numberToMonth(m);
-      if (month) this.printResults(month);
+    Object.keys(monthYearData).forEach((key: string) => {
+      this.reset();
+      const d: string[] = key.split('/');
+      // console.log(key);
+      // console.log(monthYearData[key]);
+      this.processData(monthYearData[key], `${numberToMonth(Number(d[0]))} ${d[1]}`);
     });
-    */
   }
 
   private processBuyTrade(trade: HoodTradeTy): void {
