@@ -23,7 +23,10 @@ import {
   numberToMonth,
   getMetadatForMonth
 } from './utils';
-import { printMetadata } from './print';
+import {
+  printMetadata,
+  printHeadline
+} from './print';
 
 
 export default class RobinhoodFIFO {
@@ -62,8 +65,11 @@ export default class RobinhoodFIFO {
     const monthYearData: {[key: string]: HoodTradeTy[]} = getMonthYearData(rows);
     Object.keys(monthYearData).forEach((key: string) => {
       const md: MetaDataTy = getMetadatForMonth(monthYearData[key], key);
-      console.log(key);
+      printHeadline(key);
       printMetadata(md);
+      console.log('');
+      console.log('');
+      console.log('');
       /*
       this.reset();
       const trades = filterRowsByTransCode(monthYearData[key]);
