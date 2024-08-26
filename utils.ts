@@ -230,3 +230,15 @@ export async function getRawData(dirPath: string): Promise<HoodTradeTy []> {
   }
   return rows;
 }
+
+
+export function numberToMonth(monthNumber: number): string | null {
+  const monthNames = [
+    'January', 'February', 'March',
+    'April', 'May', 'June',
+    'July', 'August', 'September',
+    'October', 'November', 'December'
+  ];
+  if (monthNumber < 1 || monthNumber > 12) return null;
+  return monthNames[monthNumber - 1];
+}

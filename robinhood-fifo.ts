@@ -18,7 +18,8 @@ import {
   calculateSymbolProfits,
   printSymbolTotalProfit,
   getTotalData,
-  getRawData
+  getRawData,
+  numberToMonth
 } from './utils';
 
 
@@ -42,10 +43,20 @@ export default class RobinhoodFIFO {
         else this.processSellTrade(trade);
       }
       this.totalData = getTotalData(rows);
-      this.printResults();
+      this.printResults('Total');
+
+      this.processMonthlyStmt(rows);
     } catch (error) {
       console.error(error);
     }
+  }
+
+  private processMonthlyStmt(rows: HoodTradeTy[]): void {
+    this.reset();
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].forEach((m: number) => {
+      const month: string | null = numberToMonth(m);
+      if (month) this.printResults(month);
+    });
   }
 
   private processBuyTrade(trade: HoodTradeTy): void {
@@ -108,15 +119,15 @@ export default class RobinhoodFIFO {
     }
   }
 
-  private printResults(): void {
+  private printResults(type: string): void {
     if (this.txsData.length) {
       console.log('');
-      printWithDots('*** Account Activity', '', '*');
+      printWithDots(`*** ${type} Account Activity`, '', '*');
       console.log('');
       printTable(this.txsData);
       console.log('');
       console.log('');
-      printWithDots('*** Total Gain/Loss', '', '*');
+      printWithDots(`*** ${type} Gain/Loss`, '', '*');
       console.log('***');
       const totalProfitRes: TotalProfitResultTy = calculateTotalProfit(this.txsData);
       printTotalGainLoss(totalProfitRes);
@@ -125,25 +136,36 @@ export default class RobinhoodFIFO {
       printSymbolTotalProfit(symbolProfits);
       console.log('');
       console.log('');
-      printWithDots('*** Total Fees & Dividends', '', '*');
+      printWithDots(`*** ${type} Fees & Dividends`, '', '*');
       console.log('***');
       printWithDots('Fees', `$${this.totalData.fees}`);
       printWithDots('Dividends', `$${this.totalData.dividends}`);
       console.log('');
       console.log('');
-      printWithDots('*** Total Deposit & Withdrawal', '', '*');
+      printWithDots(`*** ${type} Deposit & Withdrawal`, '', '*');
       console.log('***');
       printWithDots('Deposit', `$${this.totalData.deposit}`);
       printWithDots('Withdrawal', `$${this.totalData.withdrawal}`);
     }
     console.log('');
     console.log('');
-    printWithDots('*** Portfolio Summary (Current State)', '', '*');
+    printWithDots(`*** ${type} Portfolio Summary`, '', '*');
     console.log('***');
     Object.entries(this.gQueue).forEach(([symbol, queue]) => {
       if (!queue.isEmpty()) printSummary(queue.getList());
     });
     console.log('');
+  }
+
+  private reset() {
+    this.gQueue = {};
+    this.txsData = [];
+    this.totalData = {
+      fees: 0,
+      dividends: 0,
+      deposit: 0,
+      withdrawal: 0,
+    };
   }
 }
 
