@@ -147,14 +147,16 @@ export default class RobinhoodFIFO {
       printWithDots('Deposit', `$${this.totalData.deposit}`);
       printWithDots('Withdrawal', `$${this.totalData.withdrawal}`);
     }
-    console.log('');
-    console.log('');
-    printWithDots(`*** ${type} Portfolio Summary`, '', '*');
-    console.log('***');
-    Object.entries(this.gQueue).forEach(([symbol, queue]) => {
-      if (!queue.isEmpty()) printSummary(queue.getList());
-    });
-    console.log('');
+    if (Object.keys(this.gQueue).length) {
+      console.log('');
+      console.log('');
+      printWithDots(`*** ${type} Portfolio Summary`, '', '*');
+      console.log('***');
+      Object.entries(this.gQueue).forEach(([symbol, queue]) => {
+        if (!queue.isEmpty()) printSummary(queue.getList());
+      });
+      console.log('');
+    }
   }
 
   private reset() {
