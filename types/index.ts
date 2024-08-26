@@ -37,9 +37,10 @@ export interface SymbolProfitTy {
 };
 
 
-export interface TotalDataTy {
+export interface MetaDataTy {
   fees: number;
-  dividends: number;
+  dividend: number;
   deposit: number;
   withdrawal: number;
+  interest: number;
 }

@@ -5,7 +5,7 @@ import {
   HoodTradeTy,
   ClosingTradeTy,
   TotalProfitResultTy,
-  TotalDataTy
+  MetaDataTy
 } from './types';
 import {
   filterRowsByTransCode,
@@ -20,49 +20,57 @@ import {
   getTotalData,
   getRawData,
   getMonthYearData,
-  numberToMonth
+  numberToMonth,
+  getMetadatForMonth
 } from './utils';
+import { printMetadata } from './print';
 
 
 export default class RobinhoodFIFO {
   // This is a variable where I keep orders for every symbol in a queue.
   private gQueue: {[key: string]: QueueType<HoodTradeTy>} = {};
   private txsData: ClosingTradeTy[] = [];
-  private totalData: TotalDataTy = {
+  private totalData: MetaDataTy = {
     fees: 0,
-    dividends: 0,
+    dividend: 0,
     deposit: 0,
     withdrawal: 0,
+    interest: 0
   };
 
   async run(): Promise<void> {
     try {
       const rows: HoodTradeTy[] = await getRawData(path.resolve(__dirname, '../input'));
-      this.processData(rows, 'Total');
+      // this.processData(rows, 'Total');
       this.processMonthlyStmt(rows);
     } catch (error) {
       console.error(error);
     }
   }
 
-  private processData(rows: HoodTradeTy[], type: string): void {
+  private processTrades(rows: HoodTradeTy[]): void {
     const trades = filterRowsByTransCode(rows);
     for (const trade of trades) {
       if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
       else this.processSellTrade(trade);
     }
-    this.totalData = getTotalData(rows);
-    this.printResults(type);
+    // this.totalData = getTotalData(rows);
+    // this.printResults(type);
   }
 
   private processMonthlyStmt(rows: HoodTradeTy[]): void {
     const monthYearData: {[key: string]: HoodTradeTy[]} = getMonthYearData(rows);
     Object.keys(monthYearData).forEach((key: string) => {
+      const md: MetaDataTy = getMetadatForMonth(monthYearData[key], key);
+      console.log(key);
+      printMetadata(md);
+      /*
       this.reset();
-      const d: string[] = key.split('/');
-      // console.log(key);
-      // console.log(monthYearData[key]);
-      this.processData(monthYearData[key], `${numberToMonth(Number(d[0]))} ${d[1]}`);
+      const trades = filterRowsByTransCode(monthYearData[key]);
+      // const d: string[] = key.split('/');
+      this.processTrades(monthYearData[key]);
+      console.log('');
+      */
     });
   }
 
@@ -146,7 +154,7 @@ export default class RobinhoodFIFO {
       printWithDots(`*** ${type} Fees & Dividends`, '', '*');
       console.log('***');
       printWithDots('Fees', `$${this.totalData.fees}`);
-      printWithDots('Dividends', `$${this.totalData.dividends}`);
+      printWithDots('Dividends', `$${this.totalData.dividend}`);
       console.log('');
       console.log('');
       printWithDots(`*** ${type} Deposit & Withdrawal`, '', '*');
@@ -171,9 +179,10 @@ export default class RobinhoodFIFO {
     this.txsData = [];
     this.totalData = {
       fees: 0,
-      dividends: 0,
+      dividend: 0,
       deposit: 0,
       withdrawal: 0,
+      interest: 0
     };
   }
 }

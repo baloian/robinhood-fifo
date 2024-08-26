@@ -6,8 +6,16 @@ import {
   ClosingTradeTy,
   TotalProfitResultTy,
   SymbolProfitTy,
-  TotalDataTy
+  MetaDataTy
 } from './types';
+
+
+function dateToMonthYear(dateString: string): string {
+  const parts = dateString.split('/');
+  const month = parts[0];
+  const year = parts[2];
+  return `${month}/${year}`;
+}
 
 
 export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): ClosingTradeTy {
@@ -87,25 +95,48 @@ export function filterRowsByTransCode(rows: HoodTradeTy []): HoodTradeTy [] {
 
 export function getTradesByMonth(rows: HoodTradeTy [], month: string): HoodTradeTy [] {
   const filteredRows = rows.filter(row =>
-    (row.trans_code === 'Sell' || row.trans_code === 'Buy') &&
+    row.process_date &&
     Number(row.process_date.split('/')[0]) <= Number(month));
   return filteredRows.reverse();
 }
 
 
-export function getTotalData(rows: HoodTradeTy []): TotalDataTy {
-  const data: TotalDataTy = {
+export function getTotalData(rows: HoodTradeTy []): MetaDataTy {
+  const data: MetaDataTy = {
     fees: 0,
-    dividends: 0,
+    dividend: 0,
     deposit: 0,
-    withdrawal: 0
+    withdrawal: 0,
+    interest: 0
   };
   rows.forEach((row: HoodTradeTy) => {
     if (row.trans_code === 'GOLD' || row.trans_code === 'MINT') data.fees += row.amount;
-    if (row.trans_code === 'CDIV') data.dividends += row.amount;
+    if (row.trans_code === 'CDIV') data.dividend += row.amount;
     if (row.trans_code === 'ACH') {
       if (row.description === 'ACH Deposit') data.deposit += row.amount;
       if (row.description === 'ACH Withdrawal') data.withdrawal += row.amount;
+    }
+  });
+  return data;
+}
+
+
+export function getMetadatForMonth(rows: HoodTradeTy [], monthYear: string): MetaDataTy {
+  const data: MetaDataTy = {
+    fees: 0,
+    dividend: 0,
+    deposit: 0,
+    withdrawal: 0,
+    interest: 0
+  };
+  rows.forEach((row: HoodTradeTy) => {
+    if (monthYear === dateToMonthYear(row.process_date)) {
+      if (row.trans_code === 'GOLD' || row.trans_code === 'MINT') data.fees += row.amount;
+      if (row.trans_code === 'CDIV') data.dividend += row.amount;
+      if (row.trans_code === 'ACH') {
+        if (row.description === 'ACH Deposit') data.deposit += row.amount;
+        if (row.description === 'ACH Withdrawal') data.withdrawal += row.amount;
+      }
     }
   });
   return data;
@@ -253,16 +284,10 @@ export function numberToMonth(monthNumber: number): string | null {
 
 
 export function getMonthYearData(rows: HoodTradeTy []): {[key: string]: HoodTradeTy[]} {
-  const convertDateFormat = (dateString: string): string => {
-    const parts = dateString.split('/');
-    const month = parts[0];
-    const year = parts[2];
-    return `${month}/${year}`;
-  };
   const monthYearData: {[key: string]: HoodTradeTy[]} = {};
   for (const row of rows) {
     if (row.process_date) {
-      const key: string = convertDateFormat(row.process_date);
+      const key: string = dateToMonthYear(row.process_date);
       if (!monthYearData[key]) {
         monthYearData[key] = getTradesByMonth(rows, key.split('/')[0]);
       }
