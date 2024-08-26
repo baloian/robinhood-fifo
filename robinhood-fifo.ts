@@ -21,11 +21,13 @@ import {
   getRawData,
   getMonthYearData,
   numberToMonth,
-  getMetadatForMonth
+  getMetadatForMonth,
+  getTxsForMonth
 } from './utils';
 import {
   printMetadata,
-  printHeadline
+  printHeadline,
+  printTxs
 } from './print';
 
 
@@ -67,6 +69,9 @@ export default class RobinhoodFIFO {
       const md: MetaDataTy = getMetadatForMonth(monthYearData[key], key);
       printHeadline(key);
       printMetadata(md);
+      const txs: HoodTradeTy[] = getTxsForMonth(monthYearData[key], key);
+      printTxs(txs);
+      console.log('');
       console.log('');
       console.log('');
       console.log('');

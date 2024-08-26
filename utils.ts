@@ -143,6 +143,14 @@ export function getMetadatForMonth(rows: HoodTradeTy [], monthYear: string): Met
 }
 
 
+export function getTxsForMonth(rows: HoodTradeTy[], monthYear: string): HoodTradeTy[] {
+  return rows.filter(row =>
+      monthYear === dateToMonthYear(row.process_date) &&
+      (row.trans_code === 'Sell' || row.trans_code === 'Buy')
+  );
+}
+
+
 export function printTable(trades: ClosingTradeTy[]): void {
   // Define the table headers
   const headers = ['Symbol', 'Qty', 'Sell Price', 'Sold At', 'Profit $', 'Profit %'];
@@ -265,7 +273,7 @@ export async function getRawData(dirPath: string): Promise<HoodTradeTy []> {
   let rows: HoodTradeTy[] = [];
   const files = await fs.promises.readdir(dirPath);
   for (const filename of files) {
-    rows = [...rows, ...await parseCSV(`${dirPath}/${filename}`)]
+    rows = [...rows, ...await parseCSV(`${dirPath}/${filename}`)];
   }
   return rows;
 }
