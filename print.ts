@@ -8,15 +8,15 @@ import {
 
 export function printMetadata(data: MetaDataTy): void {
   printWithDots('///// Income Summary', '', '/');
-  printWithDots('Dividend', `$${data.dividend}`);
-  printWithDots('Interest', `$${data.interest}`);
+  printWithDots('Dividend', `${formatToUSD(data.dividend)}`);
+  printWithDots('Interest', `${formatToUSD(data.interest)}`);
   console.log('');
   printWithDots('///// Cost and Fees', '', '/');
-  printWithDots('Fees', `$${data.fees}`);
+  printWithDots('Fees', `${formatToUSD(data.fees)}`);
   console.log('');
   printWithDots(`///// Deposit & Withdrawal`, '', '/');
-  printWithDots('Deposit', `$${data.deposit}`);
-  printWithDots('Withdrawal', `$${data.withdrawal}`);
+  printWithDots('Deposit', `${formatToUSD(data.deposit)}`);
+  printWithDots('Withdrawal', `${formatToUSD(data.withdrawal)}`);
   console.log('');
 }
 
