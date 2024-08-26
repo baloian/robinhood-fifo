@@ -19,7 +19,7 @@ import {
   printSymbolTotalProfit,
   getTotalData,
   getRawData,
-  numberToMonth
+  getMonthYearData
 } from './utils';
 
 
@@ -52,11 +52,21 @@ export default class RobinhoodFIFO {
   }
 
   private processMonthlyStmt(rows: HoodTradeTy[]): void {
+    const monthYearData: {[key: string]: HoodTradeTy[]} = getMonthYearData(rows);
+    console.log(monthYearData);
+    /*
     this.reset();
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].forEach((m: number) => {
+      const trades = getTradesByMonth(rows, m);
+      if (trades.length) {
+        console.log(numberToMonth(m));
+        console.log(trades);
+        console.log('');
+      }
       const month: string | null = numberToMonth(m);
       if (month) this.printResults(month);
     });
+    */
   }
 
   private processBuyTrade(trade: HoodTradeTy): void {

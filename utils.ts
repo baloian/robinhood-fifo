@@ -85,6 +85,14 @@ export function filterRowsByTransCode(rows: HoodTradeTy []): HoodTradeTy [] {
 }
 
 
+export function getTradesByMonth(rows: HoodTradeTy [], month: string): HoodTradeTy [] {
+  const filteredRows = rows.filter(row =>
+    (row.trans_code === 'Sell' || row.trans_code === 'Buy') &&
+    Number(row.process_date.split('/')[0]) <= Number(month));
+  return filteredRows.reverse();
+}
+
+
 export function getTotalData(rows: HoodTradeTy []): TotalDataTy {
   const data: TotalDataTy = {
     fees: 0,
@@ -241,4 +249,24 @@ export function numberToMonth(monthNumber: number): string | null {
   ];
   if (monthNumber < 1 || monthNumber > 12) return null;
   return monthNames[monthNumber - 1];
+}
+
+
+export function getMonthYearData(rows: HoodTradeTy []): {[key: string]: HoodTradeTy[]} {
+  const convertDateFormat = (dateString: string): string => {
+    const parts = dateString.split('/');
+    const month = parts[0];
+    const year = parts[2];
+    return `${month}/${year}`;
+  };
+  const monthYearData: {[key: string]: HoodTradeTy[]} = {};
+  for (const row of rows) {
+    if (row.process_date) {
+      const key: string = convertDateFormat(row.process_date);
+      if (!monthYearData[key]) {
+        monthYearData[key] = getTradesByMonth(rows, key.split('/')[0]);
+      }
+    }
+  }
+  return monthYearData;
 }
