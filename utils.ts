@@ -133,7 +133,8 @@ export function calculateTotalGainLoss(data: ClosingTradeTy[], monthYear: string
 }
 
 
-// Note that this calculates percentage as weighted average of profit percentages based on the size of the investments.
+// Note that this calculates percentage as weighted average of profit percentages based on
+// the size of the investments.
 export function calculateSymbolProfits(data: ClosingTradeTy[], monthYear: string): SymbolProfitTy[] {
   const trades = data.filter(d => dateToMonthYear(d.sell_process_date) === monthYear);
   const result: {[key: string]: {total_profit: number; total_profit_pct: number}} = {};
