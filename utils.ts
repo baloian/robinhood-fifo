@@ -11,10 +11,8 @@ import {
 
 
 function dateToMonthYear(dateString: string): string {
-  const parts = dateString.split('/');
-  const month = parts[0];
-  const year = parts[2];
-  return `${month}/${year}`;
+  const parts: string[] = dateString.split('/');
+  return `${parts[0]}/${parts[2]}`;
 }
 
 
@@ -38,7 +36,6 @@ export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): C
 function convertToNumber(value: string): number {
   // Remove currency symbols and parentheses
   const cleanedValue = value.replace(/[\$,()]/g, '');
-  // Convert cleaned value to a number
   return parseFloat(cleanedValue);
 }
 
@@ -119,10 +116,8 @@ export function calculateTotalGainLoss(data: ClosingTradeTy[], monthYear: string
   trades.forEach((trade) => {
     const buyDate = new Date(trade.buy_process_date);
     const sellDate = new Date(trade.sell_process_date);
-
     const timeDifference = sellDate.getTime() - buyDate.getTime();
     const oneYearInMilliseconds = 365 * 24 * 60 * 60 * 1000;
-
     if (timeDifference > oneYearInMilliseconds) {
       profitSummary.long_term_profit += trade.profit;
     } else {
