@@ -4,7 +4,7 @@ import csv from 'csv-parser';
 import {
   HoodTradeTy,
   ClosingTradeTy,
-  TotalProfitResultTy,
+  GainLossTy,
   SymbolProfitTy,
   MetaDataTy
 } from './types';
@@ -110,10 +110,26 @@ export function getTxsForMonth(rows: HoodTradeTy[], monthYear: string): HoodTrad
 }
 
 
-export function calculateTotalProfit(data: ClosingTradeTy[], monthYear: string): number {
-  return data
-    .filter(d => dateToMonthYear(d.sell_process_date) === monthYear)
-    .reduce((totalProfit, trade) => totalProfit + trade.profit, 0);
+export function calculateTotalGainLoss(data: ClosingTradeTy[], monthYear: string): GainLossTy {
+  const trades = data.filter(d => dateToMonthYear(d.sell_process_date) === monthYear);
+  const profitSummary: GainLossTy = {
+    long_term_profit: 0,
+    short_term_profit: 0
+  };
+  trades.forEach((trade) => {
+    const buyDate = new Date(trade.buy_process_date);
+    const sellDate = new Date(trade.sell_process_date);
+
+    const timeDifference = sellDate.getTime() - buyDate.getTime();
+    const oneYearInMilliseconds = 365 * 24 * 60 * 60 * 1000;
+
+    if (timeDifference > oneYearInMilliseconds) {
+      profitSummary.long_term_profit += trade.profit;
+    } else {
+      profitSummary.short_term_profit += trade.profit;
+    }
+  });
+  return profitSummary;
 }
 
 

@@ -1,5 +1,5 @@
 import { formatToUSD, QueueType } from '@baloian/lib';
-import { MetaDataTy, HoodTradeTy, SymbolProfitTy } from './types';
+import { MetaDataTy, HoodTradeTy, SymbolProfitTy, GainLossTy } from './types';
 import {
   numberToMonth
 } from './utils';
@@ -86,13 +86,18 @@ export function printHoldings(data: {[key: string]: QueueType<HoodTradeTy>}): vo
 }
 
 
-export function printGainLoss(data: SymbolProfitTy[], totalProfit: number): void {
+export function printGainLoss(data: SymbolProfitTy[], gainLoss: GainLossTy): void {
   console.log('');
   printWithDots('///// Realized Gain/Loss', '', '/');
   console.log('/');
-  printWithDots('Total', `${formatToUSD(totalProfit)}`);
+  printWithDots('Total (short term)', `${formatToUSD(gainLoss.short_term_profit)}`);
+  printWithDots('Total (long term)', `${formatToUSD(gainLoss.long_term_profit)}`);
   console.log('');
-  data.forEach((item: SymbolProfitTy) => {
-    printWithDots(item.symbol, `${formatToUSD(item.total_profit)} / ${item.total_profit_pct}%`);
-  });
+  if (data.length > 0) {
+    printWithDots('///// Realized Gain/Loss by Symbols', '', '/');
+    console.log('/');
+    data.forEach((item: SymbolProfitTy) => {
+      printWithDots(item.symbol, `${formatToUSD(item.total_profit)} / ${item.total_profit_pct}%`);
+    });
+  }
 }
