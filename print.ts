@@ -22,17 +22,11 @@ function printWithDots(value1: string, value2: string, symbol: string = '-'): vo
 
 
 export function printMetadata(data: MetaDataTy): void {
-  printWithDots('///// Income Summary', '', '');
+  printWithDots('///// Income, Fees, Deposit and Withdrawal', '', '');
   console.log('-----');
   printWithDots('Dividend', `${formatToUSD(data.dividend)}`);
   printWithDots('Interest', `${formatToUSD(data.interest)}`);
-  console.log('');
-  printWithDots('///// Cost and Fees', '', '');
-  console.log('-----');
   printWithDots('Fees', `${formatToUSD(data.fees)}`);
-  console.log('');
-  printWithDots('///// Deposit & Withdrawal', '', '');
-  console.log('-----');
   printWithDots('Deposit', `${formatToUSD(data.deposit)}`);
   printWithDots('Withdrawal', `${formatToUSD(data.withdrawal)}`);
   console.log('');
