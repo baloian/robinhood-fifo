@@ -41,14 +41,6 @@ export default class RobinhoodFIFO {
     }
   }
 
-  private processTrades(rows: HoodTradeTy[]): void {
-    const trades = rows.filter(row => row.trans_code === 'Sell' || row.trans_code === 'Buy');
-    for (const trade of trades) {
-      if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
-      else this.processSellTrade(trade);
-    }
-  }
-
   private processMonthlyStmts(rows: HoodTradeTy[]): void {
     const monthYearData: {[key: string]: HoodTradeTy[]} = getMonthYearData(rows);
     const monthYearList: string[] = sortMonthsAndYears(Object.keys(monthYearData));
@@ -68,6 +60,14 @@ export default class RobinhoodFIFO {
       printGainLoss(symbolProfits, totalGainLoss);
       console.log('\n\n\n\n\n');
     });
+  }
+
+  private processTrades(rows: HoodTradeTy[]): void {
+    const trades = rows.filter(row => row.trans_code === 'Sell' || row.trans_code === 'Buy');
+    for (const trade of trades) {
+      if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
+      else this.processSellTrade(trade);
+    }
   }
 
   private processBuyTrade(trade: HoodTradeTy): void {
