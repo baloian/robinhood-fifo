@@ -13,7 +13,8 @@ import {
   getMonthYearData,
   getMetadatForMonth,
   getTxsForMonth,
-  calculateSymbolProfits
+  calculateSymbolProfits,
+  calculateTotalProfit
 } from './utils';
 import {
   printMetadata,
@@ -60,7 +61,8 @@ export default class RobinhoodFIFO {
       this.reset();
       this.processTrades(deepCopy(monthYearData[monthYear]));
       const symbolProfits: SymbolProfitTy[] = calculateSymbolProfits(this.txsData, monthYear);
-      printGainLoss(symbolProfits);
+      const totalProfit: number = calculateTotalProfit(this.txsData, monthYear);
+      printGainLoss(symbolProfits, totalProfit);
       console.log('\n\n\n\n');
     });
   }

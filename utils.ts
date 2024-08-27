@@ -110,21 +110,10 @@ export function getTxsForMonth(rows: HoodTradeTy[], monthYear: string): HoodTrad
 }
 
 
-export function calculateTotalProfit(trades: ClosingTradeTy[]): TotalProfitResultTy {
-  let total_profit: number = 0;
-  let total_profit_pct: number = 0;
-  trades.forEach(trade => {
-    const { profit, profit_pct } = trade;
-    total_profit += profit;
-    const currentProfitFactor = 1 + profit_pct / 100;
-    const totalProfitFactor = 1 + total_profit_pct / 100;
-    const newTotalProfitFactor = totalProfitFactor * currentProfitFactor;
-    total_profit_pct = (newTotalProfitFactor - 1) * 100;
-  });
-  return {
-    total_profit: round(total_profit),
-    total_profit_pct: round(total_profit_pct)
-  };
+export function calculateTotalProfit(data: ClosingTradeTy[], monthYear: string): number {
+  return data
+    .filter(d => dateToMonthYear(d.sell_process_date) === monthYear)
+    .reduce((totalProfit, trade) => totalProfit + trade.profit, 0);
 }
 
 

@@ -86,10 +86,12 @@ export function printHoldings(data: {[key: string]: QueueType<HoodTradeTy>}): vo
 }
 
 
-export function printGainLoss(data: SymbolProfitTy[]): void {
+export function printGainLoss(data: SymbolProfitTy[], totalProfit: number): void {
   console.log('');
   printWithDots('///// Realized Gain/Loss', '', '/');
   console.log('/');
+  printWithDots('Total', `${formatToUSD(totalProfit)}`);
+  console.log('');
   data.forEach((item: SymbolProfitTy) => {
     printWithDots(item.symbol, `${formatToUSD(item.total_profit)} / ${item.total_profit_pct}%`);
   });
