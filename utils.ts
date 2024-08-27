@@ -128,22 +128,25 @@ export function calculateTotalProfit(trades: ClosingTradeTy[]): TotalProfitResul
 }
 
 
-export function calculateSymbolProfits(trades: ClosingTradeTy[]): SymbolProfitTy[] {
-  const symbolProfits: { [key: string]: { total_profit: number; total_profit_pct: number } } = {};
+// Note that this calculates percentage as weighted average of profit percentages based on the size of the investments.
+export function calculateSymbolProfits(data: ClosingTradeTy[], monthYear: string): SymbolProfitTy[] {
+  const trades = data.filter(d => dateToMonthYear(d.sell_process_date) === monthYear);
+  const result: {[key: string]: {total_profit: number; total_profit_pct: number}} = {};
   trades.forEach(trade => {
-    const { symbol, profit, profit_pct } = trade;
-    if (!symbolProfits[symbol]) {
-      symbolProfits[symbol] = { total_profit: 0, total_profit_pct: 0 };
-    }
-    symbolProfits[symbol].total_profit += profit;
-    symbolProfits[symbol].total_profit_pct =
-      (1 + symbolProfits[symbol].total_profit_pct / 100) * (1 + profit_pct / 100) - 1;
-    symbolProfits[symbol].total_profit_pct *= 100;
+    const investment = trade.buy_qty * trade.buy_price;
+    if (!result[trade.symbol]) result[trade.symbol] = {total_profit: 0, total_profit_pct: 0};
+    const symbolData = result[trade.symbol];
+    symbolData.total_profit += trade.profit;
+    const totalInvestment = (symbolData.total_profit_pct * symbolData.total_profit) + investment;
+    symbolData.total_profit_pct = (
+      (symbolData.total_profit_pct * (totalInvestment - investment)) +
+      (trade.profit_pct * investment)
+    ) / totalInvestment;
   });
-  return Object.keys(symbolProfits).map(symbol => ({
+  return Object.keys(result).map(symbol => ({
     symbol: symbol,
-    total_profit: round(symbolProfits[symbol].total_profit),
-    total_profit_pct: round(symbolProfits[symbol].total_profit_pct)
+    total_profit: round(result[symbol].total_profit),
+    total_profit_pct: round(result[symbol].total_profit_pct)
   }));
 }
 

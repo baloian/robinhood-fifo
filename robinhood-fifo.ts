@@ -48,18 +48,18 @@ export default class RobinhoodFIFO {
 
   private processMonthlyStmts(rows: HoodTradeTy[]): void {
     const monthYearData: {[key: string]: HoodTradeTy[]} = getMonthYearData(rows);
-    Object.keys(monthYearData).forEach((key: string) => {
+    Object.keys(monthYearData).forEach((monthYear: string) => {
       this.reset();
-      printHeadline(key);
-      const md: MetaDataTy = getMetadatForMonth(monthYearData[key], key);
+      printHeadline(monthYear);
+      const md: MetaDataTy = getMetadatForMonth(monthYearData[monthYear], monthYear);
       printMetadata(md);
-      const txs: HoodTradeTy[] = getTxsForMonth(monthYearData[key], key);
+      const txs: HoodTradeTy[] = getTxsForMonth(monthYearData[monthYear], monthYear);
       printTxs(txs);
-      this.processTrades(deepCopy(monthYearData[key]));
+      this.processTrades(deepCopy(monthYearData[monthYear]));
       printHoldings(this.gQueue);
       this.reset();
-      this.processTrades(deepCopy(monthYearData[key]));
-      const symbolProfits: SymbolProfitTy[] = calculateSymbolProfits(this.txsData);
+      this.processTrades(deepCopy(monthYearData[monthYear]));
+      const symbolProfits: SymbolProfitTy[] = calculateSymbolProfits(this.txsData, monthYear);
       printGainLoss(symbolProfits);
       console.log('\n\n\n\n');
     });
