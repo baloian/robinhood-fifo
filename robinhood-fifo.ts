@@ -17,7 +17,8 @@ import {
   printMetadata,
   printHeadline,
   printTxs,
-  printHoldings
+  printHoldings,
+  printGainLoss
 } from './print';
 
 
@@ -54,6 +55,9 @@ export default class RobinhoodFIFO {
       printTxs(txs);
       this.processTrades(monthYearData[key]);
       printHoldings(this.gQueue);
+      this.reset();
+      this.processTrades(monthYearData[key]);
+      printGainLoss(this.txsData);
       console.log('');
       console.log('');
       console.log('');

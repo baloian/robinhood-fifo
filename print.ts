@@ -1,5 +1,5 @@
 import { formatToUSD, QueueType } from '@baloian/lib';
-import { MetaDataTy, HoodTradeTy } from './types';
+import { MetaDataTy, HoodTradeTy, ClosingTradeTy } from './types';
 import {
   numberToMonth
 } from './utils';
@@ -83,4 +83,12 @@ export function printHoldings(data: {[key: string]: QueueType<HoodTradeTy>}): vo
       Object.keys(holdingData).forEach((s: string) => printWithDots(s, `${holdingData[s]}`));
     }
   });
+}
+
+
+export function printGainLoss(data: ClosingTradeTy[]): void {
+  console.log('');
+  if (data.length > 0) {
+    console.log(data);
+  }
 }
