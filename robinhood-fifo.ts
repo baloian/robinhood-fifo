@@ -15,7 +15,8 @@ import {
   getMetadatForMonth,
   getTxsForMonth,
   calculateSymbolProfits,
-  calculateTotalGainLoss
+  calculateTotalGainLoss,
+  sortMonthsAndYears
 } from './utils';
 import {
   printMetadata,
@@ -50,7 +51,8 @@ export default class RobinhoodFIFO {
 
   private processMonthlyStmts(rows: HoodTradeTy[]): void {
     const monthYearData: {[key: string]: HoodTradeTy[]} = getMonthYearData(rows);
-    Object.keys(monthYearData).forEach((monthYear: string) => {
+    const monthYearList: string[] = sortMonthsAndYears(Object.keys(monthYearData));
+    monthYearList.forEach((monthYear: string) => {
       this.reset();
       printHeadline(monthYear);
       const md: MetaDataTy = getMetadatForMonth(monthYearData[monthYear], monthYear);
@@ -64,7 +66,7 @@ export default class RobinhoodFIFO {
       const symbolProfits: SymbolProfitTy[] = calculateSymbolProfits(this.txsData, monthYear);
       const totalGainLoss: GainLossTy = calculateTotalGainLoss(this.txsData, monthYear);
       printGainLoss(symbolProfits, totalGainLoss);
-      console.log('\n\n\n\n');
+      console.log('\n\n\n\n\n');
     });
   }
 

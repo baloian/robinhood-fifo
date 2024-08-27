@@ -191,3 +191,13 @@ export function getMonthYearData(rows: HoodTradeTy []): {[key: string]: HoodTrad
   }
   return monthYearData;
 }
+
+
+export function sortMonthsAndYears(dates: string[]): string[] {
+  return dates.sort((a, b) => {
+    const [monthA, yearA] = a.split('/').map(Number);
+    const [monthB, yearB] = b.split('/').map(Number);
+    if (yearA !== yearB) return yearA - yearB;
+    return monthA - monthB;
+  });
+}
