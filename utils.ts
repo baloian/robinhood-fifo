@@ -72,27 +72,6 @@ export async function parseCSV(filePath: string): Promise<HoodTradeTy []> {
 }
 
 
-function convertDateToMilliseconds(dateStr: string): number {
-  const [month, day, year] = dateStr.split('/').map(Number);
-  const date = new Date(year, month - 1, day);
-  // Get the time in milliseconds since the Unix epoch
-  const milliseconds = date.getTime();
-  return milliseconds;
-}
-
-
-export function filterRowsByTransCode(rows: HoodTradeTy []): HoodTradeTy [] {
-  const filteredRows = rows.filter(row => row.trans_code === 'Sell' || row.trans_code === 'Buy');
-  // Sort filtered rows by process_date
-  const sortedRows: HoodTradeTy[] = filteredRows.reverse().sort((a, b) => {
-    const dateA = convertDateToMilliseconds(a.process_date);
-    const dateB = convertDateToMilliseconds(b.process_date);
-    return dateA - dateB;
-  });
-  return sortedRows;
-}
-
-
 export function getTradesByMonth(rows: HoodTradeTy [], month: string): HoodTradeTy [] {
   const filteredRows = rows.filter(row =>
     row.process_date &&

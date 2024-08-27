@@ -8,7 +8,6 @@ import {
   MetaDataTy
 } from './types';
 import {
-  filterRowsByTransCode,
   getTradeRecord,
   printTable,
   calculateTotalProfit,
@@ -17,17 +16,16 @@ import {
   printSummary,
   calculateSymbolProfits,
   printSymbolTotalProfit,
-  getTotalData,
   getRawData,
   getMonthYearData,
-  numberToMonth,
   getMetadatForMonth,
   getTxsForMonth
 } from './utils';
 import {
   printMetadata,
   printHeadline,
-  printTxs
+  printTxs,
+  printHoldings
 } from './print';
 
 
@@ -54,7 +52,7 @@ export default class RobinhoodFIFO {
   }
 
   private processTrades(rows: HoodTradeTy[]): void {
-    const trades = filterRowsByTransCode(rows);
+    const trades = rows.filter(row => row.trans_code === 'Sell' || row.trans_code === 'Buy');
     for (const trade of trades) {
       if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
       else this.processSellTrade(trade);
@@ -66,11 +64,14 @@ export default class RobinhoodFIFO {
   private processMonthlyStmt(rows: HoodTradeTy[]): void {
     const monthYearData: {[key: string]: HoodTradeTy[]} = getMonthYearData(rows);
     Object.keys(monthYearData).forEach((key: string) => {
-      const md: MetaDataTy = getMetadatForMonth(monthYearData[key], key);
+      this.reset();
       printHeadline(key);
+      const md: MetaDataTy = getMetadatForMonth(monthYearData[key], key);
       printMetadata(md);
       const txs: HoodTradeTy[] = getTxsForMonth(monthYearData[key], key);
       printTxs(txs);
+      this.processTrades(monthYearData[key]);
+      printHoldings(this.gQueue);
       console.log('');
       console.log('');
       console.log('');
@@ -93,9 +94,11 @@ export default class RobinhoodFIFO {
   private processSellTrade(sellTrade: HoodTradeTy): void {
     const v = Validator.verifySell(this.gQueue, sellTrade.symbol, sellTrade.quantity);
     if (v) {
+      /*
       console.error('WARNING!');
       console.error(v);
       console.log('This will not be part of the calculation.');
+      */
       return;
     }
     const symbolQueue = this.gQueue[sellTrade.symbol];

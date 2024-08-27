@@ -1,4 +1,4 @@
-import { formatToUSD } from '@baloian/lib';
+import { formatToUSD, QueueType } from '@baloian/lib';
 import { MetaDataTy, HoodTradeTy } from './types';
 import {
   printWithDots,
@@ -8,13 +8,16 @@ import {
 
 export function printMetadata(data: MetaDataTy): void {
   printWithDots('///// Income Summary', '', '/');
+  console.log('/');
   printWithDots('Dividend', `${formatToUSD(data.dividend)}`);
   printWithDots('Interest', `${formatToUSD(data.interest)}`);
   console.log('');
   printWithDots('///// Cost and Fees', '', '/');
+  console.log('/');
   printWithDots('Fees', `${formatToUSD(data.fees)}`);
   console.log('');
-  printWithDots(`///// Deposit & Withdrawal`, '', '/');
+  printWithDots('///// Deposit & Withdrawal', '', '/');
+  console.log('/');
   printWithDots('Deposit', `${formatToUSD(data.deposit)}`);
   printWithDots('Withdrawal', `${formatToUSD(data.withdrawal)}`);
   console.log('');
@@ -45,8 +48,24 @@ export function printTxs(txs: HoodTradeTy[]): void {
       (tx.trans_code === 'Buy' ? 'BUY' : 'SELL').padEnd(10),
       tx.quantity.toString().padEnd(10),
       formatToUSD(tx.price).padEnd(10),
-      `${formatToUSD(tx.quantity * tx.price)}`.padEnd(10)
+      formatToUSD(tx.amount).padEnd(10)
     ].join(' | ');
     console.log(rowString);
+  });
+}
+
+
+export function printHoldings(data: {[key: string]: QueueType<HoodTradeTy>}): void {
+  console.log('');
+  printWithDots('///// Holdings', '', '/');
+  console.log('/');
+  Object.keys(data).forEach((symbol: string) => {
+    if (!data[symbol].isEmpty()) {
+      const holdingData = data[symbol].getList().reduce((acc, trade) => {
+        acc[trade.symbol] = (acc[trade.symbol] || 0) + trade.quantity;
+        return acc;
+      }, {} as { [key: string]: number });
+      Object.keys(holdingData).forEach((s: string) => printWithDots(s, `${holdingData[s]}`));
+    }
   });
 }
