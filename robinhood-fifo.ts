@@ -4,48 +4,68 @@ import Validator from './validator';
 import {
   HoodTradeTy,
   ClosingTradeTy,
-  TotalProfitResultTy,
-  TotalDataTy
+  MetaDataTy,
+  SymbolProfitTy,
+  GainLossTy
 } from './types';
 import {
-  filterRowsByTransCode,
   getTradeRecord,
-  printTable,
-  calculateTotalProfit,
-  printTotalGainLoss,
-  printWithDots,
-  printSummary,
+  getRawData,
+  getMonthYearData,
+  getMetadatForMonth,
+  getTxsForMonth,
   calculateSymbolProfits,
-  printSymbolTotalProfit,
-  getTotalData,
-  getRawData
+  calculateTotalGainLoss
 } from './utils';
+import {
+  printMetadata,
+  printHeadline,
+  printTxs,
+  printHoldings,
+  printGainLoss
+} from './print';
 
 
 export default class RobinhoodFIFO {
   // This is a variable where I keep orders for every symbol in a queue.
   private gQueue: {[key: string]: QueueType<HoodTradeTy>} = {};
   private txsData: ClosingTradeTy[] = [];
-  private totalData: TotalDataTy = {
-    fees: 0,
-    dividends: 0,
-    deposit: 0,
-    withdrawal: 0,
-  };
 
   async run(): Promise<void> {
     try {
       const rows: HoodTradeTy[] = await getRawData(path.resolve(__dirname, '../input'));
-      const trades = filterRowsByTransCode(rows);
-      for (const trade of trades) {
-        if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
-        else this.processSellTrade(trade);
-      }
-      this.totalData = getTotalData(rows);
-      this.printResults();
+      this.processMonthlyStmts(rows);
     } catch (error) {
       console.error(error);
     }
+  }
+
+  private processTrades(rows: HoodTradeTy[]): void {
+    const trades = rows.filter(row => row.trans_code === 'Sell' || row.trans_code === 'Buy');
+    for (const trade of trades) {
+      if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
+      else this.processSellTrade(trade);
+    }
+  }
+
+  private processMonthlyStmts(rows: HoodTradeTy[]): void {
+    const monthYearData: {[key: string]: HoodTradeTy[]} = getMonthYearData(rows);
+    Object.keys(monthYearData).forEach((monthYear: string) => {
+      this.reset();
+      printHeadline(monthYear);
+      const md: MetaDataTy = getMetadatForMonth(monthYearData[monthYear], monthYear);
+      printMetadata(md);
+      const txs: HoodTradeTy[] = getTxsForMonth(monthYearData[monthYear], monthYear);
+      printTxs(txs);
+      this.processTrades(deepCopy(monthYearData[monthYear]));
+      printHoldings(this.gQueue);
+      this.reset();
+      this.processTrades(deepCopy(monthYearData[monthYear]));
+      const symbolProfits: SymbolProfitTy[] = calculateSymbolProfits(this.txsData, monthYear);
+      const totalGainLoss: GainLossTy = calculateTotalGainLoss(this.txsData, monthYear);
+      printGainLoss(symbolProfits, totalGainLoss);
+      console.log('\n\n\n\n');
+    });
   }
 
   private processBuyTrade(trade: HoodTradeTy): void {
@@ -55,12 +75,7 @@ export default class RobinhoodFIFO {
 
   private processSellTrade(sellTrade: HoodTradeTy): void {
     const v = Validator.verifySell(this.gQueue, sellTrade.symbol, sellTrade.quantity);
-    if (v) {
-      console.error('WARNING!');
-      console.error(v);
-      console.log('This will not be part of the calculation.');
-      return;
-    }
+    if (v) return;
     const symbolQueue = this.gQueue[sellTrade.symbol];
     const buyTrade: HoodTradeTy | undefined = symbolQueue.front();
     if (!buyTrade) return;
@@ -108,42 +123,9 @@ export default class RobinhoodFIFO {
     }
   }
 
-  private printResults(): void {
-    if (this.txsData.length) {
-      console.log('');
-      printWithDots('*** Account Activity', '', '*');
-      console.log('');
-      printTable(this.txsData);
-      console.log('');
-      console.log('');
-      printWithDots('*** Total Gain/Loss', '', '*');
-      console.log('***');
-      const totalProfitRes: TotalProfitResultTy = calculateTotalProfit(this.txsData);
-      printTotalGainLoss(totalProfitRes);
-      const symbolProfits = calculateSymbolProfits(this.txsData);
-      console.log('');
-      printSymbolTotalProfit(symbolProfits);
-      console.log('');
-      console.log('');
-      printWithDots('*** Total Fees & Dividends', '', '*');
-      console.log('***');
-      printWithDots('Fees', `$${this.totalData.fees}`);
-      printWithDots('Dividends', `$${this.totalData.dividends}`);
-      console.log('');
-      console.log('');
-      printWithDots('*** Total Deposit & Withdrawal', '', '*');
-      console.log('***');
-      printWithDots('Deposit', `$${this.totalData.deposit}`);
-      printWithDots('Withdrawal', `$${this.totalData.withdrawal}`);
-    }
-    console.log('');
-    console.log('');
-    printWithDots('*** Portfolio Summary (Current State)', '', '*');
-    console.log('***');
-    Object.entries(this.gQueue).forEach(([symbol, queue]) => {
-      if (!queue.isEmpty()) printSummary(queue.getList());
-    });
-    console.log('');
+  private reset() {
+    this.gQueue = {};
+    this.txsData = [];
   }
 }
 

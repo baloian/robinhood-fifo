@@ -1,13 +1,21 @@
-import { round, pctDiff, formatToUSD } from '@baloian/lib';
+import { round, pctDiff } from '@baloian/lib';
 import fs from 'fs';
 import csv from 'csv-parser';
 import {
   HoodTradeTy,
   ClosingTradeTy,
-  TotalProfitResultTy,
+  GainLossTy,
   SymbolProfitTy,
-  TotalDataTy
+  MetaDataTy
 } from './types';
+
+
+function dateToMonthYear(dateString: string): string {
+  const parts = dateString.split('/');
+  const month = parts[0];
+  const year = parts[2];
+  return `${month}/${year}`;
+}
 
 
 export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): ClosingTradeTy {
@@ -64,161 +72,88 @@ export async function parseCSV(filePath: string): Promise<HoodTradeTy []> {
 }
 
 
-function convertDateToMilliseconds(dateStr: string): number {
-  const [month, day, year] = dateStr.split('/').map(Number);
-  const date = new Date(year, month - 1, day);
-  // Get the time in milliseconds since the Unix epoch
-  const milliseconds = date.getTime();
-  return milliseconds;
+export function getTradesByMonth(rows: HoodTradeTy [], month: string): HoodTradeTy [] {
+  const filteredRows = rows.filter(row =>
+    row.process_date &&
+    Number(row.process_date.split('/')[0]) <= Number(month));
+  return filteredRows.reverse();
 }
 
 
-export function filterRowsByTransCode(rows: HoodTradeTy []): HoodTradeTy [] {
-  const filteredRows = rows.filter(row => row.trans_code === 'Sell' || row.trans_code === 'Buy');
-  // Sort filtered rows by process_date
-  const sortedRows: HoodTradeTy[] = filteredRows.reverse().sort((a, b) => {
-    const dateA = convertDateToMilliseconds(a.process_date);
-    const dateB = convertDateToMilliseconds(b.process_date);
-    return dateA - dateB;
-  });
-  return sortedRows;
-}
-
-
-export function getTotalData(rows: HoodTradeTy []): TotalDataTy {
-  const data: TotalDataTy = {
+export function getMetadatForMonth(rows: HoodTradeTy [], monthYear: string): MetaDataTy {
+  const data: MetaDataTy = {
     fees: 0,
-    dividends: 0,
+    dividend: 0,
     deposit: 0,
-    withdrawal: 0
+    withdrawal: 0,
+    interest: 0
   };
   rows.forEach((row: HoodTradeTy) => {
-    if (row.trans_code === 'GOLD' || row.trans_code === 'MINT') data.fees += row.amount;
-    if (row.trans_code === 'CDIV') data.dividends += row.amount;
-    if (row.trans_code === 'ACH') {
-      if (row.description === 'ACH Deposit') data.deposit += row.amount;
-      if (row.description === 'ACH Withdrawal') data.withdrawal += row.amount;
+    if (monthYear === dateToMonthYear(row.process_date)) {
+      if (row.trans_code === 'GOLD' || row.trans_code === 'MINT') data.fees += row.amount;
+      if (row.trans_code === 'CDIV') data.dividend += row.amount;
+      if (row.trans_code === 'ACH') {
+        if (row.description === 'ACH Deposit') data.deposit += row.amount;
+        if (row.description === 'ACH Withdrawal') data.withdrawal += row.amount;
+      }
     }
   });
   return data;
 }
 
 
-export function printTable(trades: ClosingTradeTy[]): void {
-  // Define the table headers
-  const headers = ['Symbol', 'Qty', 'Sell Price', 'Sold At', 'Profit $', 'Profit %'];
-  const headerRow = headers.map(header => header.padEnd(11)).join(' | ');
-  const separator = headers.map(() => '-----------').join('-|-');
-
-  console.log(headerRow);
-  console.log(separator);
-
-  trades.forEach(trade => {
-    const rowString = [
-      trade.symbol.padEnd(11),
-      trade.sell_qty.toString().padEnd(11),
-      formatToUSD(trade.sell_price).padEnd(11),
-      trade.sell_process_date.padEnd(11),
-      formatToUSD(trade.profit).padEnd(11),
-      `${trade.profit_pct.toString()}%`.padEnd(11)
-    ].join(' | ');
-    console.log(rowString);
-  });
+export function getTxsForMonth(rows: HoodTradeTy[], monthYear: string): HoodTradeTy[] {
+  return rows.filter(row =>
+      monthYear === dateToMonthYear(row.process_date) &&
+      (row.trans_code === 'Sell' || row.trans_code === 'Buy')
+  );
 }
 
 
-export function printSummary(trades: HoodTradeTy[]): void {
-  // Define the table headers
-  const headers = ['Symbol', 'Qty', 'Amount', 'Processed At'];
-  const headerRow = headers.map(header => header.padEnd(12)).join(' | ');
-  const separator = headers.map(() => '------------').join('-|-');
-
-  console.log(headerRow);
-  console.log(separator);
-
-  trades.forEach(trade => {
-    const rowString = [
-      trade.symbol.padEnd(12),
-      trade.quantity.toString().padEnd(12),
-      formatToUSD(trade.amount).padEnd(12),
-      trade.process_date.padEnd(12)
-    ].join(' | ');
-    console.log(rowString);
-  });
-}
-
-
-export function calculateTotalProfit(trades: ClosingTradeTy[]): TotalProfitResultTy {
-  let total_profit: number = 0;
-  let total_profit_pct: number = 0;
-  trades.forEach(trade => {
-    const { profit, profit_pct } = trade;
-    total_profit += profit;
-    const currentProfitFactor = 1 + profit_pct / 100;
-    const totalProfitFactor = 1 + total_profit_pct / 100;
-    const newTotalProfitFactor = totalProfitFactor * currentProfitFactor;
-    total_profit_pct = (newTotalProfitFactor - 1) * 100;
-  });
-  return {
-    total_profit: round(total_profit),
-    total_profit_pct: round(total_profit_pct)
+export function calculateTotalGainLoss(data: ClosingTradeTy[], monthYear: string): GainLossTy {
+  const trades = data.filter(d => dateToMonthYear(d.sell_process_date) === monthYear);
+  const profitSummary: GainLossTy = {
+    long_term_profit: 0,
+    short_term_profit: 0
   };
-}
+  trades.forEach((trade) => {
+    const buyDate = new Date(trade.buy_process_date);
+    const sellDate = new Date(trade.sell_process_date);
 
+    const timeDifference = sellDate.getTime() - buyDate.getTime();
+    const oneYearInMilliseconds = 365 * 24 * 60 * 60 * 1000;
 
-export function printWithDots(value1: string, value2: string, symbol: string = '-'): void {
-  const totalLength = 78;
-  const totalValuesLength = value1.length + value2.length;
-  const totalDots = totalLength - totalValuesLength;
-  /*
-  if (totalDots < 0) {
-    console.error('The combined length of the values exceeds the total line length.');
-    return;
-  }
-  */
-  const line: string = `${value1} ${symbol.repeat(totalDots)}` +
-    (value2.length > 0 ? ` ${value2}` : symbol);
-  console.log(line);
-}
-
-
-export function printTotalGainLoss(profit: TotalProfitResultTy): void {
-  printWithDots('Gain/Loss ($)', formatToUSD(profit.total_profit));
-  printWithDots('Gain/Loss (%)', `${profit.total_profit_pct}%`);
-}
-
-
-export function printSymbolTotalProfit(data: SymbolProfitTy[]): void {
-  data.forEach((item: SymbolProfitTy) => {
-    printWithDots(item.symbol, `${formatToUSD(item.total_profit)} / ${item.total_profit_pct}%`);
-  });
-}
-
-
-export function calculateSymbolProfits(trades: ClosingTradeTy[]): SymbolProfitTy[] {
-  const symbolProfits: { [key: string]: { total_profit: number; total_profit_pct: number } } = {};
-  trades.forEach(trade => {
-    const { symbol, profit, profit_pct } = trade;
-    if (!symbolProfits[symbol]) {
-      symbolProfits[symbol] = { total_profit: 0, total_profit_pct: 0 };
+    if (timeDifference > oneYearInMilliseconds) {
+      profitSummary.long_term_profit += trade.profit;
+    } else {
+      profitSummary.short_term_profit += trade.profit;
     }
-    symbolProfits[symbol].total_profit += profit;
-    symbolProfits[symbol].total_profit_pct =
-      (1 + symbolProfits[symbol].total_profit_pct / 100) * (1 + profit_pct / 100) - 1;
-    symbolProfits[symbol].total_profit_pct *= 100;
   });
-  return Object.keys(symbolProfits).map(symbol => ({
-    symbol: symbol,
-    total_profit: round(symbolProfits[symbol].total_profit),
-    total_profit_pct: round(symbolProfits[symbol].total_profit_pct)
-  }));
+  return profitSummary;
 }
 
 
-export function getTotalQty(items: HoodTradeTy[]): number {
-  let total: number = 0;
-  items.forEach((e: any) => total += e.qty);
-  return total;
+// Note that this calculates percentage as weighted average of profit percentages based on
+// the size of the investments.
+export function calculateSymbolProfits(data: ClosingTradeTy[], monthYear: string): SymbolProfitTy[] {
+  const trades = data.filter(d => dateToMonthYear(d.sell_process_date) === monthYear);
+  const result: {[key: string]: {total_profit: number; total_profit_pct: number}} = {};
+  trades.forEach(trade => {
+    const investment = trade.buy_qty * trade.buy_price;
+    if (!result[trade.symbol]) result[trade.symbol] = {total_profit: 0, total_profit_pct: 0};
+    const symbolData = result[trade.symbol];
+    symbolData.total_profit += trade.profit;
+    const totalInvestment = (symbolData.total_profit_pct * symbolData.total_profit) + investment;
+    symbolData.total_profit_pct = (
+      (symbolData.total_profit_pct * (totalInvestment - investment)) +
+      (trade.profit_pct * investment)
+    ) / totalInvestment;
+  });
+  return Object.keys(result).map(symbol => ({
+    symbol: symbol,
+    total_profit: round(result[symbol].total_profit),
+    total_profit_pct: round(result[symbol].total_profit_pct)
+  }));
 }
 
 
@@ -226,7 +161,33 @@ export async function getRawData(dirPath: string): Promise<HoodTradeTy []> {
   let rows: HoodTradeTy[] = [];
   const files = await fs.promises.readdir(dirPath);
   for (const filename of files) {
-    rows = [...rows, ...await parseCSV(`${dirPath}/${filename}`)]
+    rows = [...rows, ...await parseCSV(`${dirPath}/${filename}`)];
   }
   return rows;
+}
+
+
+export function numberToMonth(monthNumber: number): string | null {
+  const monthNames = [
+    'January', 'February', 'March',
+    'April', 'May', 'June',
+    'July', 'August', 'September',
+    'October', 'November', 'December'
+  ];
+  if (monthNumber < 1 || monthNumber > 12) return null;
+  return monthNames[monthNumber - 1];
+}
+
+
+export function getMonthYearData(rows: HoodTradeTy []): {[key: string]: HoodTradeTy[]} {
+  const monthYearData: {[key: string]: HoodTradeTy[]} = {};
+  for (const row of rows) {
+    if (row.process_date) {
+      const key: string = dateToMonthYear(row.process_date);
+      if (!monthYearData[key]) {
+        monthYearData[key] = getTradesByMonth(rows, key.split('/')[0]);
+      }
+    }
+  }
+  return monthYearData;
 }
