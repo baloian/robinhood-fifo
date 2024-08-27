@@ -80,26 +80,6 @@ export function getTradesByMonth(rows: HoodTradeTy [], month: string): HoodTrade
 }
 
 
-export function getTotalData(rows: HoodTradeTy []): MetaDataTy {
-  const data: MetaDataTy = {
-    fees: 0,
-    dividend: 0,
-    deposit: 0,
-    withdrawal: 0,
-    interest: 0
-  };
-  rows.forEach((row: HoodTradeTy) => {
-    if (row.trans_code === 'GOLD' || row.trans_code === 'MINT') data.fees += row.amount;
-    if (row.trans_code === 'CDIV') data.dividend += row.amount;
-    if (row.trans_code === 'ACH') {
-      if (row.description === 'ACH Deposit') data.deposit += row.amount;
-      if (row.description === 'ACH Withdrawal') data.withdrawal += row.amount;
-    }
-  });
-  return data;
-}
-
-
 export function getMetadatForMonth(rows: HoodTradeTy [], monthYear: string): MetaDataTy {
   const data: MetaDataTy = {
     fees: 0,
@@ -130,50 +110,6 @@ export function getTxsForMonth(rows: HoodTradeTy[], monthYear: string): HoodTrad
 }
 
 
-export function printTable(trades: ClosingTradeTy[]): void {
-  // Define the table headers
-  const headers = ['Symbol', 'Qty', 'Sell Price', 'Sold At', 'Profit $', 'Profit %'];
-  const headerRow = headers.map(header => header.padEnd(11)).join(' | ');
-  const separator = headers.map(() => '-----------').join('-|-');
-
-  console.log(headerRow);
-  console.log(separator);
-
-  trades.forEach(trade => {
-    const rowString = [
-      trade.symbol.padEnd(11),
-      trade.sell_qty.toString().padEnd(11),
-      formatToUSD(trade.sell_price).padEnd(11),
-      trade.sell_process_date.padEnd(11),
-      formatToUSD(trade.profit).padEnd(11),
-      `${trade.profit_pct.toString()}%`.padEnd(11)
-    ].join(' | ');
-    console.log(rowString);
-  });
-}
-
-
-export function printSummary(trades: HoodTradeTy[]): void {
-  // Define the table headers
-  const headers = ['Symbol', 'Qty', 'Amount', 'Processed At'];
-  const headerRow = headers.map(header => header.padEnd(12)).join(' | ');
-  const separator = headers.map(() => '------------').join('-|-');
-
-  console.log(headerRow);
-  console.log(separator);
-
-  trades.forEach(trade => {
-    const rowString = [
-      trade.symbol.padEnd(12),
-      trade.quantity.toString().padEnd(12),
-      formatToUSD(trade.amount).padEnd(12),
-      trade.process_date.padEnd(12)
-    ].join(' | ');
-    console.log(rowString);
-  });
-}
-
-
 export function calculateTotalProfit(trades: ClosingTradeTy[]): TotalProfitResultTy {
   let total_profit: number = 0;
   let total_profit_pct: number = 0;
@@ -189,35 +125,6 @@ export function calculateTotalProfit(trades: ClosingTradeTy[]): TotalProfitResul
     total_profit: round(total_profit),
     total_profit_pct: round(total_profit_pct)
   };
-}
-
-
-export function printWithDots(value1: string, value2: string, symbol: string = '-'): void {
-  const totalLength = 78;
-  const totalValuesLength = value1.length + value2.length;
-  const totalDots = totalLength - totalValuesLength;
-  /*
-  if (totalDots < 0) {
-    console.error('The combined length of the values exceeds the total line length.');
-    return;
-  }
-  */
-  const line: string = `${value1} ${symbol.repeat(totalDots)}` +
-    (value2.length > 0 ? ` ${value2}` : symbol);
-  console.log(line);
-}
-
-
-export function printTotalGainLoss(profit: TotalProfitResultTy): void {
-  printWithDots('Gain/Loss ($)', formatToUSD(profit.total_profit));
-  printWithDots('Gain/Loss (%)', `${profit.total_profit_pct}%`);
-}
-
-
-export function printSymbolTotalProfit(data: SymbolProfitTy[]): void {
-  data.forEach((item: SymbolProfitTy) => {
-    printWithDots(item.symbol, `${formatToUSD(item.total_profit)} / ${item.total_profit_pct}%`);
-  });
 }
 
 
@@ -238,13 +145,6 @@ export function calculateSymbolProfits(trades: ClosingTradeTy[]): SymbolProfitTy
     total_profit: round(symbolProfits[symbol].total_profit),
     total_profit_pct: round(symbolProfits[symbol].total_profit_pct)
   }));
-}
-
-
-export function getTotalQty(items: HoodTradeTy[]): number {
-  let total: number = 0;
-  items.forEach((e: any) => total += e.qty);
-  return total;
 }
 
 

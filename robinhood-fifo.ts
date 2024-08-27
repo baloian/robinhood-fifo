@@ -4,18 +4,10 @@ import Validator from './validator';
 import {
   HoodTradeTy,
   ClosingTradeTy,
-  TotalProfitResultTy,
   MetaDataTy
 } from './types';
 import {
   getTradeRecord,
-  printTable,
-  calculateTotalProfit,
-  printTotalGainLoss,
-  printWithDots,
-  printSummary,
-  calculateSymbolProfits,
-  printSymbolTotalProfit,
   getRawData,
   getMonthYearData,
   getMetadatForMonth,
@@ -44,8 +36,7 @@ export default class RobinhoodFIFO {
   async run(): Promise<void> {
     try {
       const rows: HoodTradeTy[] = await getRawData(path.resolve(__dirname, '../input'));
-      // this.processData(rows, 'Total');
-      this.processMonthlyStmt(rows);
+      this.processMonthlyStmts(rows);
     } catch (error) {
       console.error(error);
     }
@@ -57,11 +48,9 @@ export default class RobinhoodFIFO {
       if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
       else this.processSellTrade(trade);
     }
-    // this.totalData = getTotalData(rows);
-    // this.printResults(type);
   }
 
-  private processMonthlyStmt(rows: HoodTradeTy[]): void {
+  private processMonthlyStmts(rows: HoodTradeTy[]): void {
     const monthYearData: {[key: string]: HoodTradeTy[]} = getMonthYearData(rows);
     Object.keys(monthYearData).forEach((key: string) => {
       this.reset();
@@ -76,13 +65,6 @@ export default class RobinhoodFIFO {
       console.log('');
       console.log('');
       console.log('');
-      /*
-      this.reset();
-      const trades = filterRowsByTransCode(monthYearData[key]);
-      // const d: string[] = key.split('/');
-      this.processTrades(monthYearData[key]);
-      console.log('');
-      */
     });
   }
 
@@ -145,46 +127,6 @@ export default class RobinhoodFIFO {
       buyTrade.quantity -= sellTrade.quantity;
       buyTrade.amount = round(buyTrade.quantity * buyTrade.price);
       symbolQueue.updateFront(buyTrade);
-    }
-  }
-
-  private printResults(type: string): void {
-    if (this.txsData.length) {
-      console.log('');
-      printWithDots(`*** ${type} Account Activity`, '', '*');
-      console.log('');
-      printTable(this.txsData);
-      console.log('');
-      console.log('');
-      printWithDots(`*** ${type} Gain/Loss`, '', '*');
-      console.log('***');
-      const totalProfitRes: TotalProfitResultTy = calculateTotalProfit(this.txsData);
-      printTotalGainLoss(totalProfitRes);
-      const symbolProfits = calculateSymbolProfits(this.txsData);
-      console.log('');
-      printSymbolTotalProfit(symbolProfits);
-      console.log('');
-      console.log('');
-      printWithDots(`*** ${type} Fees & Dividends`, '', '*');
-      console.log('***');
-      printWithDots('Fees', `$${this.totalData.fees}`);
-      printWithDots('Dividends', `$${this.totalData.dividend}`);
-      console.log('');
-      console.log('');
-      printWithDots(`*** ${type} Deposit & Withdrawal`, '', '*');
-      console.log('***');
-      printWithDots('Deposit', `$${this.totalData.deposit}`);
-      printWithDots('Withdrawal', `$${this.totalData.withdrawal}`);
-    }
-    if (Object.keys(this.gQueue).length) {
-      console.log('');
-      console.log('');
-      printWithDots(`*** ${type} Portfolio Summary`, '', '*');
-      console.log('***');
-      Object.entries(this.gQueue).forEach(([symbol, queue]) => {
-        if (!queue.isEmpty()) printSummary(queue.getList());
-      });
-      console.log('');
     }
   }
 

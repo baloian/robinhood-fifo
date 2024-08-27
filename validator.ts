@@ -1,6 +1,12 @@
 import { QueueType } from '@baloian/lib';
-import { getTotalQty } from './utils';
 import { HoodTradeTy } from './types';
+
+
+function getTotalQty(items: HoodTradeTy[]): number {
+  let total: number = 0;
+  items.forEach((e: any) => total += e.qty);
+  return total;
+}
 
 
 export default class Validator {

@@ -1,9 +1,24 @@
 import { formatToUSD, QueueType } from '@baloian/lib';
 import { MetaDataTy, HoodTradeTy } from './types';
 import {
-  printWithDots,
   numberToMonth
 } from './utils';
+
+
+function printWithDots(value1: string, value2: string, symbol: string = '-'): void {
+  const totalLength = 78;
+  const totalValuesLength = value1.length + value2.length;
+  const totalDots = totalLength - totalValuesLength;
+  /*
+  if (totalDots < 0) {
+    console.error('The combined length of the values exceeds the total line length.');
+    return;
+  }
+  */
+  const line: string = `${value1} ${symbol.repeat(totalDots)}` +
+    (value2.length > 0 ? ` ${value2}` : symbol);
+  console.log(line);
+}
 
 
 export function printMetadata(data: MetaDataTy): void {
