@@ -22,17 +22,17 @@ function printWithDots(value1: string, value2: string, symbol: string = '-'): vo
 
 
 export function printMetadata(data: MetaDataTy): void {
-  printWithDots('///// Income Summary', '', '/');
-  console.log('/');
+  printWithDots('///// Income Summary', '', '');
+  console.log('-----');
   printWithDots('Dividend', `${formatToUSD(data.dividend)}`);
   printWithDots('Interest', `${formatToUSD(data.interest)}`);
   console.log('');
-  printWithDots('///// Cost and Fees', '', '/');
-  console.log('/');
+  printWithDots('///// Cost and Fees', '', '');
+  console.log('-----');
   printWithDots('Fees', `${formatToUSD(data.fees)}`);
   console.log('');
-  printWithDots('///// Deposit & Withdrawal', '', '/');
-  console.log('/');
+  printWithDots('///// Deposit & Withdrawal', '', '');
+  console.log('-----');
   printWithDots('Deposit', `${formatToUSD(data.deposit)}`);
   printWithDots('Withdrawal', `${formatToUSD(data.withdrawal)}`);
   console.log('');
@@ -47,8 +47,8 @@ export function printHeadline(date: string): void {
 
 
 export function printTxs(txs: HoodTradeTy[]): void {
-  printWithDots('///// Transactions', '', '/');
-  console.log('/');
+  printWithDots('///// Transactions', '', '');
+  console.log('-----');
   const headers = ['Trade Date', 'Symbol', 'Side', 'Qty', 'Price', 'Amount'];
   const headerRow = headers.map(header => header.padEnd(10)).join(' | ');
   const separator = headers.map(() => '----------').join('-|-');
@@ -72,8 +72,8 @@ export function printTxs(txs: HoodTradeTy[]): void {
 
 export function printHoldings(data: {[key: string]: QueueType<HoodTradeTy>}): void {
   console.log('');
-  printWithDots('///// Holdings', '', '/');
-  console.log('/');
+  printWithDots('///// Holdings', '', '');
+  console.log('-----');
   Object.keys(data).forEach((symbol: string) => {
     if (!data[symbol].isEmpty()) {
       const holdingData = data[symbol].getList().reduce((acc, trade) => {
@@ -88,14 +88,14 @@ export function printHoldings(data: {[key: string]: QueueType<HoodTradeTy>}): vo
 
 export function printGainLoss(data: SymbolProfitTy[], gainLoss: GainLossTy): void {
   console.log('');
-  printWithDots('///// Realized Gain/Loss', '', '/');
-  console.log('/');
+  printWithDots('///// Realized Gain/Loss', '', '');
+  console.log('-----');
   printWithDots('Total (short term)', `${formatToUSD(gainLoss.short_term_profit)}`);
   printWithDots('Total (long term)', `${formatToUSD(gainLoss.long_term_profit)}`);
   console.log('');
   if (data.length > 0) {
-    printWithDots('///// Realized Gain/Loss by Symbols', '', '/');
-    console.log('/');
+    printWithDots('///// Realized Gain/Loss by Symbols', '', '');
+    console.log('-----');
     data.forEach((item: SymbolProfitTy) => {
       printWithDots(item.symbol, `${formatToUSD(item.total_profit)} / ${item.total_profit_pct}%`);
     });
