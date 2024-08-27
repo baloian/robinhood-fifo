@@ -4,14 +4,16 @@ import Validator from './validator';
 import {
   HoodTradeTy,
   ClosingTradeTy,
-  MetaDataTy
+  MetaDataTy,
+  SymbolProfitTy
 } from './types';
 import {
   getTradeRecord,
   getRawData,
   getMonthYearData,
   getMetadatForMonth,
-  getTxsForMonth
+  getTxsForMonth,
+  calculateSymbolProfits
 } from './utils';
 import {
   printMetadata,
@@ -53,15 +55,13 @@ export default class RobinhoodFIFO {
       printMetadata(md);
       const txs: HoodTradeTy[] = getTxsForMonth(monthYearData[key], key);
       printTxs(txs);
-      this.processTrades(monthYearData[key]);
+      this.processTrades(deepCopy(monthYearData[key]));
       printHoldings(this.gQueue);
       this.reset();
-      this.processTrades(monthYearData[key]);
-      printGainLoss(this.txsData);
-      console.log('');
-      console.log('');
-      console.log('');
-      console.log('');
+      this.processTrades(deepCopy(monthYearData[key]));
+      const symbolProfits: SymbolProfitTy[] = calculateSymbolProfits(this.txsData);
+      printGainLoss(symbolProfits);
+      console.log('\n\n\n\n');
     });
   }
 
@@ -72,14 +72,7 @@ export default class RobinhoodFIFO {
 
   private processSellTrade(sellTrade: HoodTradeTy): void {
     const v = Validator.verifySell(this.gQueue, sellTrade.symbol, sellTrade.quantity);
-    if (v) {
-      /*
-      console.error('WARNING!');
-      console.error(v);
-      console.log('This will not be part of the calculation.');
-      */
-      return;
-    }
+    if (v) return;
     const symbolQueue = this.gQueue[sellTrade.symbol];
     const buyTrade: HoodTradeTy | undefined = symbolQueue.front();
     if (!buyTrade) return;

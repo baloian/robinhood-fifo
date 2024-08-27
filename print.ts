@@ -1,5 +1,5 @@
 import { formatToUSD, QueueType } from '@baloian/lib';
-import { MetaDataTy, HoodTradeTy, ClosingTradeTy } from './types';
+import { MetaDataTy, HoodTradeTy, SymbolProfitTy } from './types';
 import {
   numberToMonth
 } from './utils';
@@ -86,9 +86,11 @@ export function printHoldings(data: {[key: string]: QueueType<HoodTradeTy>}): vo
 }
 
 
-export function printGainLoss(data: ClosingTradeTy[]): void {
+export function printGainLoss(data: SymbolProfitTy[]): void {
   console.log('');
-  if (data.length > 0) {
-    console.log(data);
-  }
+  printWithDots('///// Realized Gain/Loss', '', '/');
+  console.log('/');
+  data.forEach((item: SymbolProfitTy) => {
+    printWithDots(item.symbol, `${formatToUSD(item.total_profit)} / ${item.total_profit_pct}%`);
+  });
 }
