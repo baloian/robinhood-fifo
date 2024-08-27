@@ -25,13 +25,6 @@ export default class RobinhoodFIFO {
   // This is a variable where I keep orders for every symbol in a queue.
   private gQueue: {[key: string]: QueueType<HoodTradeTy>} = {};
   private txsData: ClosingTradeTy[] = [];
-  private totalData: MetaDataTy = {
-    fees: 0,
-    dividend: 0,
-    deposit: 0,
-    withdrawal: 0,
-    interest: 0
-  };
 
   async run(): Promise<void> {
     try {
@@ -133,13 +126,6 @@ export default class RobinhoodFIFO {
   private reset() {
     this.gQueue = {};
     this.txsData = [];
-    this.totalData = {
-      fees: 0,
-      dividend: 0,
-      deposit: 0,
-      withdrawal: 0,
-      interest: 0
-    };
   }
 }
 
