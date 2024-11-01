@@ -49,6 +49,7 @@ export default class RobinhoodFIFO {
       printHeadline(monthYear);
       const md: MetaDataTy = getMetadatForMonth(monthYearData[monthYear], monthYear);
       printMetadata(md);
+      /*
       const txs: HoodTradeTy[] = getTxsForMonth(monthYearData[monthYear], monthYear);
       printTxs(txs);
       this.processTrades(deepCopy(monthYearData[monthYear]));
@@ -59,6 +60,7 @@ export default class RobinhoodFIFO {
       const totalGainLoss: GainLossTy = calculateTotalGainLoss(this.txsData, monthYear);
       printGainLoss(symbolProfits, totalGainLoss);
       console.log('\n\n\n\n\n');
+      */
     });
   }
 

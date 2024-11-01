@@ -29,6 +29,7 @@ export function printMetadata(data: MetaDataTy): void {
   printWithDots('Fees', `${formatToUSD(data.fees)}`);
   printWithDots('Deposit', `${formatToUSD(data.deposit)}`);
   printWithDots('Withdrawal', `${formatToUSD(data.withdrawal)}`);
+  if (data.benefit) printWithDots('Benefit', `${formatToUSD(data.benefit)}`);
   console.log('');
 }
 

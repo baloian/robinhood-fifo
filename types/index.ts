@@ -37,6 +37,7 @@ export interface MetaDataTy {
   deposit: number;
   withdrawal: number;
   interest: number;
+  benefit: number;
 }
 
 

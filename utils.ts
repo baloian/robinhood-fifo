@@ -83,12 +83,14 @@ export function getMetadatForMonth(rows: HoodTradeTy [], monthYear: string): Met
     dividend: 0,
     deposit: 0,
     withdrawal: 0,
-    interest: 0
+    interest: 0,
+    benefit: 0
   };
   rows.forEach((row: HoodTradeTy) => {
     if (monthYear === dateToMonthYear(row.process_date)) {
       if (row.trans_code === 'GOLD' || row.trans_code === 'MINT') data.fees += row.amount;
       if (row.trans_code === 'CDIV') data.dividend += row.amount;
+      if (row.trans_code === 'GDBP' || row.trans_code === 'T/A') data.benefit += row.amount;
       if (row.trans_code === 'ACH') {
         if (row.description === 'ACH Deposit') data.deposit += row.amount;
         if (row.description === 'ACH Withdrawal') data.withdrawal += row.amount;
