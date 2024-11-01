@@ -158,7 +158,11 @@ export async function getRawData(dirPath: string): Promise<HoodTradeTy []> {
   for (const filename of files) {
     rows = [...rows, ...await parseCSV(`${dirPath}/${filename}`)];
   }
-  return rows;
+  return rows.filter(item => item.process_date).sort((a, b) => {
+    const dateA = new Date(a.process_date);
+    const dateB = new Date(b.process_date);
+    return dateA.getTime() - dateB.getTime();
+  });
 }
 
 
