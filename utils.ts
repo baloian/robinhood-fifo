@@ -181,11 +181,9 @@ export function numberToMonth(monthNumber: number): string | null {
 export function getMonthYearData(rows: HoodTradeTy []): {[key: string]: HoodTradeTy[]} {
   const monthYearData: {[key: string]: HoodTradeTy[]} = {};
   for (const row of rows) {
-    if (row.process_date) {
-      const key: string = dateToMonthYear(row.process_date);
-      if (!monthYearData[key]) {
-        monthYearData[key] = getTradesByMonth(rows, key.split('/')[0]);
-      }
+    const key: string = dateToMonthYear(row.process_date);
+    if (!monthYearData[key]) {
+      monthYearData[key] = getTradesByMonth(rows, key.split('/')[0]);
     }
   }
   return monthYearData;
