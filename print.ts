@@ -41,8 +41,6 @@ export function printHeadline(date: string): void {
 
 
 export function printTxs(txs: HoodTradeTy[]): void {
-  printWithDots('///// Transactions', '', '');
-  console.log('-----');
   const headers = ['Trade Date', 'Symbol', 'Side', 'Qty', 'Price', 'Amount'];
   const headerRow = headers.map(header => header.padEnd(10)).join(' | ');
   const separator = headers.map(() => '----------').join('-|-');
