@@ -1,8 +1,5 @@
-import { formatToUSD, QueueType } from '@baloian/lib';
+import { formatToUSD, QueueType, numberToMonth } from '@baloian/lib';
 import { MetaDataTy, HoodTradeTy, SymbolProfitTy, GainLossTy } from './types';
-import {
-  numberToMonth
-} from './utils';
 
 
 function printWithDots(value1: string, value2: string, symbol: string = '-'): void {

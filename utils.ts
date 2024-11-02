@@ -187,18 +187,6 @@ export async function getRawData(dirPath: string): Promise<HoodTradeTy []> {
 }
 
 
-export function numberToMonth(monthNumber: number): string | null {
-  const monthNames = [
-    'January', 'February', 'March',
-    'April', 'May', 'June',
-    'July', 'August', 'September',
-    'October', 'November', 'December'
-  ];
-  if (monthNumber < 1 || monthNumber > 12) return null;
-  return monthNames[monthNumber - 1];
-}
-
-
 export function getMonthYearData(rows: HoodTradeTy []): {[key: string]: HoodTradeTy[]} {
   const monthYearData: {[key: string]: HoodTradeTy[]} = {};
   for (const row of rows) {
