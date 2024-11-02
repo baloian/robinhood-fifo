@@ -10,7 +10,7 @@ import {
 } from './types';
 
 
-function dateToMonthYear(dateString: string): string {
+export function dateToMonthYear(dateString: string): string {
   const parts: string[] = dateString.split('/');
   return `${parts[0]}/${parts[2]}`;
 }
@@ -82,10 +82,9 @@ export async function parseCSV(filePath: string): Promise<HoodTradeTy []> {
 
 
 export function getTradesByMonth(rows: HoodTradeTy [], month: string): HoodTradeTy [] {
-  const filteredRows = rows.filter(row =>
+  return rows.filter(row =>
     row.process_date &&
     Number(row.process_date.split('/')[0]) <= Number(month));
-  return filteredRows.reverse();
 }
 
 
@@ -169,11 +168,13 @@ export function calculateSymbolProfits(data: ClosingTradeTy[], monthYear: string
 
 
 export async function getRawData(dirPath: string): Promise<HoodTradeTy []> {
-  let listOfRows: HoodTradeTy[][] = [];
+  const listOfRows: HoodTradeTy[][] = [];
   const files = await fs.promises.readdir(dirPath);
   for (const filename of files) {
     listOfRows.push(await parseCSV(`${dirPath}/${filename}`));
   }
+  // To merge all the ordered sub-lists into one list without altering the original
+  // order within each sub-list.
   return sortListsByLastProcessDate(listOfRows);
 }
 

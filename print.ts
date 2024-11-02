@@ -22,8 +22,6 @@ function printWithDots(value1: string, value2: string, symbol: string = '-'): vo
 
 
 export function printMetadata(data: MetaDataTy): void {
-  printWithDots('///// Income, Fees, Deposit and Withdrawal', '', '');
-  console.log('-----');
   printWithDots('Dividend', `${formatToUSD(data.dividend)}`);
   printWithDots('Interest', `${formatToUSD(data.interest)}`);
   printWithDots('Fees', `${formatToUSD(data.fees)}`);
@@ -52,7 +50,7 @@ export function printTxs(txs: HoodTradeTy[]): void {
   console.log(headerRow);
   console.log(separator);
 
-  txs.forEach(tx => {
+  txs.reverse().forEach(tx => {
     const rowString = [
       tx.process_date.padEnd(10),
       tx.symbol.padEnd(10),

@@ -49,7 +49,6 @@ export default class RobinhoodFIFO {
       printHeadline(monthYear);
       const md: MetaDataTy = getMetadatForMonth(monthYearData[monthYear], monthYear);
       printMetadata(md);
-      /*
       const txs: HoodTradeTy[] = getTxsForMonth(monthYearData[monthYear], monthYear);
       printTxs(txs);
       this.processTrades(deepCopy(monthYearData[monthYear]));
@@ -59,7 +58,6 @@ export default class RobinhoodFIFO {
       const symbolProfits: SymbolProfitTy[] = calculateSymbolProfits(this.txsData, monthYear);
       const totalGainLoss: GainLossTy = calculateTotalGainLoss(this.txsData, monthYear);
       printGainLoss(symbolProfits, totalGainLoss);
-      */
       console.log('\n\n\n\n\n');
     });
   }
@@ -81,6 +79,12 @@ export default class RobinhoodFIFO {
     if (v) return;
     const symbolQueue = this.gQueue[sellTrade.symbol];
     const buyTrade: HoodTradeTy | undefined = symbolQueue.front();
+
+    /*
+    console.log('Sell trade', sellTrade);
+    console.log(this.gQueue[sellTrade.symbol]);
+    process.exit();
+    */
 
     if (!buyTrade) return;
     if (buyTrade.quantity - sellTrade.quantity === 0 || buyTrade.quantity - sellTrade.quantity > 0) {
