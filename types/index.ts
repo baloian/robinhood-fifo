@@ -38,6 +38,7 @@ export interface MetaDataTy {
   withdrawal: number;
   interest: number;
   benefit: number;
+  acats: number;
 }
 
 

@@ -30,6 +30,7 @@ export function printMetadata(data: MetaDataTy): void {
   printWithDots('Deposit', `${formatToUSD(data.deposit)}`);
   printWithDots('Withdrawal', `${formatToUSD(data.withdrawal)}`);
   if (data.benefit) printWithDots('Benefit', `${formatToUSD(data.benefit)}`);
+  if (data.acats) printWithDots('ACATS Transfer', `${formatToUSD(data.acats)}`);
   console.log('');
 }
 

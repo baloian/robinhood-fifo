@@ -35,8 +35,7 @@ export default class RobinhoodFIFO {
   async run(): Promise<void> {
     try {
       const rows: HoodTradeTy[] = await getRawData(path.resolve(__dirname, '../input'));
-      console.log(rows);
-      // this.processMonthlyStmts(rows);
+      this.processMonthlyStmts(rows);
     } catch (error) {
       console.error(error);
     }
@@ -50,6 +49,7 @@ export default class RobinhoodFIFO {
       printHeadline(monthYear);
       const md: MetaDataTy = getMetadatForMonth(monthYearData[monthYear], monthYear);
       printMetadata(md);
+      /*
       const txs: HoodTradeTy[] = getTxsForMonth(monthYearData[monthYear], monthYear);
       printTxs(txs);
       this.processTrades(deepCopy(monthYearData[monthYear]));
@@ -59,6 +59,7 @@ export default class RobinhoodFIFO {
       const symbolProfits: SymbolProfitTy[] = calculateSymbolProfits(this.txsData, monthYear);
       const totalGainLoss: GainLossTy = calculateTotalGainLoss(this.txsData, monthYear);
       printGainLoss(symbolProfits, totalGainLoss);
+      */
       console.log('\n\n\n\n\n');
     });
   }
