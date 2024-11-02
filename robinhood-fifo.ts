@@ -79,13 +79,6 @@ export default class RobinhoodFIFO {
     if (v) return;
     const symbolQueue = this.gQueue[sellTrade.symbol];
     const buyTrade: HoodTradeTy | undefined = symbolQueue.front();
-
-    /*
-    console.log('Sell trade', sellTrade);
-    console.log(this.gQueue[sellTrade.symbol]);
-    process.exit();
-    */
-
     if (!buyTrade) return;
     if (buyTrade.quantity - sellTrade.quantity === 0 || buyTrade.quantity - sellTrade.quantity > 0) {
       this.sellFullOrPartially(buyTrade, sellTrade);
