@@ -98,18 +98,26 @@ export function getMetadatForMonth(rows: HoodTradeTy [], monthYear: string): Met
     benefit: 0,
     acats: 0
   };
+
+  const transCodeMap: { [key: string]: keyof typeof data } = {
+    GOLD: 'fees',
+    MINT: 'fees',
+    CDIV: 'dividend',
+    ACATI: 'acats',
+    GDBP: 'benefit',
+    'T/A': 'benefit'
+  };
+
   rows.forEach((row: HoodTradeTy) => {
-    if (monthYear === dateToMonthYear(row.process_date)) {
-      if (row.trans_code === 'GOLD' || row.trans_code === 'MINT') data.fees += row.amount;
-      if (row.trans_code === 'CDIV') data.dividend += row.amount;
-      if (row.trans_code === 'ACATI') data.acats += row.amount;
-      if (row.trans_code === 'GDBP' || row.trans_code === 'T/A') data.benefit += row.amount;
-      if (row.trans_code === 'ACH') {
-        if (row.description === 'ACH Deposit') data.deposit += row.amount;
-        if (row.description === 'ACH Withdrawal') data.withdrawal += row.amount;
-      }
+    if (monthYear !== dateToMonthYear(row.process_date)) return;
+    const property = transCodeMap[row.trans_code];
+    if (property) {
+      data[property] += row.amount;
+    } else if (row.trans_code === 'ACH') {
+      if (row.description === 'ACH Deposit') data.deposit += row.amount;
+      if (row.description === 'ACH Withdrawal') data.withdrawal += row.amount;
     }
-  });
+  })
   return data;
 }
 
