@@ -35,7 +35,8 @@ export default class RobinhoodFIFO {
   async run(): Promise<void> {
     try {
       const rows: HoodTradeTy[] = await getRawData(path.resolve(__dirname, '../input'));
-      this.processMonthlyStmts(rows);
+      console.log(rows);
+      // this.processMonthlyStmts(rows);
     } catch (error) {
       console.error(error);
     }
@@ -49,7 +50,6 @@ export default class RobinhoodFIFO {
       printHeadline(monthYear);
       const md: MetaDataTy = getMetadatForMonth(monthYearData[monthYear], monthYear);
       printMetadata(md);
-      /*
       const txs: HoodTradeTy[] = getTxsForMonth(monthYearData[monthYear], monthYear);
       printTxs(txs);
       this.processTrades(deepCopy(monthYearData[monthYear]));
@@ -60,15 +60,13 @@ export default class RobinhoodFIFO {
       const totalGainLoss: GainLossTy = calculateTotalGainLoss(this.txsData, monthYear);
       printGainLoss(symbolProfits, totalGainLoss);
       console.log('\n\n\n\n\n');
-      */
     });
   }
 
   private processTrades(rows: HoodTradeTy[]): void {
-    const trades = rows.filter(row => row.trans_code === 'Sell' || row.trans_code === 'Buy');
-    for (const trade of trades) {
+    for (const trade of rows) {
       if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
-      else this.processSellTrade(trade);
+      else if (trade.trans_code === 'Sell') this.processSellTrade(trade);
     }
   }
 
@@ -82,6 +80,7 @@ export default class RobinhoodFIFO {
     if (v) return;
     const symbolQueue = this.gQueue[sellTrade.symbol];
     const buyTrade: HoodTradeTy | undefined = symbolQueue.front();
+
     if (!buyTrade) return;
     if (buyTrade.quantity - sellTrade.quantity === 0 || buyTrade.quantity - sellTrade.quantity > 0) {
       this.sellFullOrPartially(buyTrade, sellTrade);

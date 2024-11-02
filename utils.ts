@@ -16,6 +16,18 @@ function dateToMonthYear(dateString: string): string {
 }
 
 
+function sortListsByLastProcessDate(lists: HoodTradeTy[][]): HoodTradeTy[] {
+  const sortedLists: HoodTradeTy[][] = lists
+    .filter(subList => subList.length > 0)
+    .sort((a, b) => {
+      const dateA = new Date(a[a.length - 1].process_date).getTime();
+      const dateB = new Date(b[b.length - 1].process_date).getTime();
+      return dateA - dateB;
+    });
+  return sortedLists.flatMap(subList => subList);
+}
+
+
 export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): ClosingTradeTy {
   const buyValue: number = buyTrade.price * buyTrade.quantity;
   const sellValue: number = sellTrade.price * sellTrade.quantity;
@@ -57,10 +69,10 @@ export async function parseCSV(filePath: string): Promise<HoodTradeTy []> {
           price: convertToNumber(data['Price'] || ''),
           amount: convertToNumber(data['Amount'] || '')
         };
-        results.push(row);
+        if (row.process_date) results.push(row);
       })
       .on('end', () => {
-        resolve(results);
+        resolve(results.reverse());
       })
       .on('error', (error: any) => {
         reject(error);
@@ -155,16 +167,12 @@ export function calculateSymbolProfits(data: ClosingTradeTy[], monthYear: string
 
 
 export async function getRawData(dirPath: string): Promise<HoodTradeTy []> {
-  let rows: HoodTradeTy[] = [];
+  let listOfRows: HoodTradeTy[][] = [];
   const files = await fs.promises.readdir(dirPath);
   for (const filename of files) {
-    rows = [...rows, ...await parseCSV(`${dirPath}/${filename}`)];
+    listOfRows.push(await parseCSV(`${dirPath}/${filename}`));
   }
-  return rows.filter(item => item.process_date).sort((a, b) => {
-    const dateA = new Date(a.process_date);
-    const dateB = new Date(b.process_date);
-    return dateA.getTime() - dateB.getTime();
-  });
+  return sortListsByLastProcessDate(listOfRows);
 }
 
 
