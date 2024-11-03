@@ -1,4 +1,4 @@
-import { abort } from '@baloian/lib';
+import { abort } from '@baloian/lib-ts';
 import RobinhoodFIFO from './robinhood-fifo';
 
 

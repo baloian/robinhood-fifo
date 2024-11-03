@@ -1,4 +1,4 @@
-import { formatToUSD, QueueType, numberToMonth } from '@baloian/lib';
+import { formatToUSD, QueueType, numberToMonth } from '@baloian/lib-ts';
 import { MetaDataTy, HoodTradeTy, SymbolProfitTy, GainLossTy } from './types';
 
 

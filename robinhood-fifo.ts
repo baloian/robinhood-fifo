@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { round, deepCopy, Queue, QueueType } from '@baloian/lib';
+import { round, deepCopy, Queue, QueueType } from '@baloian/lib-ts';
 import Validator from './validator';
 import {
   HoodTradeTy,

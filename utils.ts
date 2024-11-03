@@ -1,4 +1,4 @@
-import { round, pctDiff } from '@baloian/lib';
+import { round, pctDiff } from '@baloian/lib-ts';
 import fs from 'fs';
 import csv from 'csv-parser';
 import {

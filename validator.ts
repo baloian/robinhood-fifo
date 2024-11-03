@@ -1,4 +1,4 @@
-import { QueueType } from '@baloian/lib';
+import { QueueType } from '@baloian/lib-ts';
 import { HoodTradeTy } from './types';
 
 
