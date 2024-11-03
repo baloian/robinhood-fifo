@@ -11,6 +11,12 @@ import {
 
 
 export function dateToMonthYear(dateString: string): string {
+  // Regular expression to match MM/DD/YYYY format
+  dateString = dateString.trim();
+  const regex = /^(0?[1-9]|1[0-2])\/(0?[1-9]|[12][0-9]|3[01])\/\d{4}$/;
+  if (!regex.test(dateString)) {
+    throw new Error(`Invalid date format: ${dateString}. Expected format is MM/DD/YYYY.`);
+  }
   const parts: string[] = dateString.split('/');
   return `${parts[0]}/${parts[2]}`;
 }
