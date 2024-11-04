@@ -1,6 +1,7 @@
 import * as path from 'path';
 import { round, deepCopy, Queue, QueueType } from '@baloian/lib-ts';
 import Validator from './validator';
+import Parser from './parser';
 import {
   HoodTradeTy,
   ClosingTradeTy,
@@ -10,7 +11,6 @@ import {
 } from './types';
 import {
   getTradeRecord,
-  getRawData,
   getMonthYearData,
   getMetadatForMonth,
   getTxsForMonth,
@@ -34,7 +34,7 @@ export default class RobinhoodFIFO {
 
   async run(): Promise<void> {
     try {
-      const rows: HoodTradeTy[] = await getRawData(path.resolve(__dirname, '../input'));
+      const rows: HoodTradeTy[] = await Parser.getRawData(path.resolve(__dirname, '../input'));
       this.processMonthlyStmts(rows);
     } catch (error) {
       console.error(error);
