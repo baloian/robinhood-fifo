@@ -1,6 +1,4 @@
 import { round, pctDiff } from '@baloian/lib-ts';
-import fs from 'fs';
-import csv from 'csv-parser';
 import {
   HoodTradeTy,
   ClosingTradeTy,
@@ -8,6 +6,13 @@ import {
   SymbolProfitTy,
   MetaDataTy
 } from './types';
+
+
+export function convertToNumber(value: string): number {
+  // Remove currency symbols and parentheses
+  const cleanedValue = value.replace(/[\$,()]/g, '');
+  return parseFloat(cleanedValue);
+}
 
 
 export function dateToMonthYear(dateString: string): string {

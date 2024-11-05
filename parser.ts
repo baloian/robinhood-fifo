@@ -1,13 +1,7 @@
 import fs from 'fs';
 import csv from 'csv-parser';
 import { HoodTradeTy } from './types';
-
-
-function convertToNumber(value: string): number {
-  // Remove currency symbols and parentheses
-  const cleanedValue = value.replace(/[\$,()]/g, '');
-  return parseFloat(cleanedValue);
-}
+import { convertToNumber } from './utils';
 
 
 function sortListsByLastProcessDate(lists: HoodTradeTy[][]): HoodTradeTy[] {
