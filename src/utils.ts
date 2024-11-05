@@ -182,8 +182,8 @@ export function sortMonthsAndYears(dates: string[]): string[] {
 
 export function getTotalQty(items: HoodTradeTy[]): number {
   let total: number = 0;
-  items.forEach((e: any) => {
-    if (e.qty !== null && e.qty !== undefined) total += e.qty;
+  items.forEach((e: HoodTradeTy) => {
+    if (e.quantity) total += e.quantity;
   });
   return total;
 }
