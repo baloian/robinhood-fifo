@@ -170,3 +170,12 @@ export function sortMonthsAndYears(dates: string[]): string[] {
     return monthA - monthB;
   });
 }
+
+
+export function getTotalQty(items: HoodTradeTy[]): number {
+  let total: number = 0;
+  items.forEach((e: any) => {
+    if (e.qty !== null && e.qty !== undefined) total += e.qty;
+  });
+  return total;
+}
