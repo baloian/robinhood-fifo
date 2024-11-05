@@ -11,9 +11,9 @@
   "scripts": {
     "build": "rm -rf dist && tsc",
     "prepare": "npm run build",
-    "start": "tsc && NODE_ENV=${NODE_ENV-development} node dist/main.js",
+    "start": "tsc && NODE_ENV=${NODE_ENV-production} node dist/main.js",
     "dev": "tsc && NODE_ENV=${NODE_ENV-development} node dist/main.js",
-    "test": "jest"
+    "test": "rm -rf dist && tsc && jest"
   },
   "engines": {
     "node": ">=20.3.0"
