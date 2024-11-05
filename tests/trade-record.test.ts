@@ -1,5 +1,5 @@
 import { HoodTradeTy } from '../types';
-import { getTradeRecord } from '../utils';
+import { getTradeRecord } from '../src/utils';
 
 
 describe('getTradeRecord', () => {

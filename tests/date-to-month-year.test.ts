@@ -1,4 +1,4 @@
-import { dateToMonthYear } from '../utils';
+import { dateToMonthYear } from '../src/utils';
 
 
 describe('dateToMonthYear', () => {

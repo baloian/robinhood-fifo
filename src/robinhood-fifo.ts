@@ -8,7 +8,7 @@ import {
   MetaDataTy,
   SymbolProfitTy,
   GainLossTy
-} from './types';
+} from '../types';
 import {
   getTradeRecord,
   getMonthYearData,
@@ -34,7 +34,7 @@ export default class RobinhoodFIFO {
 
   async run(): Promise<void> {
     try {
-      const rows: HoodTradeTy[] = await Parser.getRawData(path.resolve(__dirname, '../input'));
+      const rows: HoodTradeTy[] = await Parser.getRawData(path.resolve(__dirname, '../../input'));
       this.processMonthlyStmts(rows);
     } catch (error) {
       console.error(error);

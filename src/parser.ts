@@ -1,6 +1,6 @@
 import fs from 'fs';
 import csv from 'csv-parser';
-import { HoodTradeTy } from './types';
+import { HoodTradeTy } from '../types';
 import { convertToNumber, sortListsByLastProcessDate } from './utils';
 
 

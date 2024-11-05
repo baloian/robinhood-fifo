@@ -1,4 +1,4 @@
-import { sortMonthsAndYears } from '../utils';
+import { sortMonthsAndYears } from '../src/utils';
 
 
 describe('sortMonthsAndYears', () => {

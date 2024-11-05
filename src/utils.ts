@@ -5,7 +5,7 @@ import {
   GainLossTy,
   SymbolProfitTy,
   MetaDataTy
-} from './types';
+} from '../types';
 
 
 export function convertToNumber(value: string): number {

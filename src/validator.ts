@@ -1,5 +1,5 @@
 import { QueueType } from '@baloian/lib-ts';
-import { HoodTradeTy } from './types';
+import { HoodTradeTy } from '../types';
 
 
 function getTotalQty(items: HoodTradeTy[]): number {

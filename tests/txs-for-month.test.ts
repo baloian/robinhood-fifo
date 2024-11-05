@@ -1,4 +1,4 @@
-import { getTxsForMonth } from '../utils';
+import { getTxsForMonth } from '../src/utils';
 import { HoodTradeTy } from '../types';
 
 

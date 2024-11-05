@@ -1,5 +1,5 @@
 
-import { sortListsByLastProcessDate } from '../utils';
+import { sortListsByLastProcessDate } from '../src/utils';
 
 
 describe('sortListsByLastProcessDate', () => {

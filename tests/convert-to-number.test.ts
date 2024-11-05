@@ -1,4 +1,4 @@
-import { convertToNumber } from '../utils';
+import { convertToNumber } from '../src/utils';
 
 
 describe('convertToNumber', () => {
