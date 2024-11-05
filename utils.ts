@@ -15,6 +15,18 @@ export function convertToNumber(value: string): number {
 }
 
 
+export function sortListsByLastProcessDate(lists: HoodTradeTy[][]): HoodTradeTy[] {
+  const sortedLists: HoodTradeTy[][] = lists
+    .filter(subList => subList.length > 0)
+    .sort((a, b) => {
+      const dateA = new Date(a[a.length - 1].process_date).getTime();
+      const dateB = new Date(b[b.length - 1].process_date).getTime();
+      return dateA - dateB;
+    });
+  return sortedLists.flatMap(subList => subList);
+}
+
+
 export function dateToMonthYear(dateString: string): string {
   // Regular expression to match MM/DD/YYYY format
   dateString = dateString.trim();

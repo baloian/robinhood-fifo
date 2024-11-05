@@ -1,19 +1,7 @@
 import fs from 'fs';
 import csv from 'csv-parser';
 import { HoodTradeTy } from './types';
-import { convertToNumber } from './utils';
-
-
-function sortListsByLastProcessDate(lists: HoodTradeTy[][]): HoodTradeTy[] {
-  const sortedLists: HoodTradeTy[][] = lists
-    .filter(subList => subList.length > 0)
-    .sort((a, b) => {
-      const dateA = new Date(a[a.length - 1].process_date).getTime();
-      const dateB = new Date(b[b.length - 1].process_date).getTime();
-      return dateA - dateB;
-    });
-  return sortedLists.flatMap(subList => subList);
-}
+import { convertToNumber, sortListsByLastProcessDate } from './utils';
 
 
 export default class Parser {  
