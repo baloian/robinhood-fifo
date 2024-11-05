@@ -8,13 +8,21 @@ import {
 } from '../types';
 
 
+/**
+ * Converts a string value from CSV file format ($NUMBER) to the numberic value.
+ * CSV files contain currency values with dollar signs and parentheses.
+ * e.g. ($123.45) to $123.45.
+ */
 export function convertToNumber(value: string): number {
-  // Remove currency symbols and parentheses
   const cleanedValue = value.replace(/[\$,()]/g, '');
   return parseFloat(cleanedValue);
 }
 
 
+/**
+ * When processing multiple CSV files, this function ensures that data is ordered based on process date.
+ * This is crucial for maintaining the correct activity order across all input files.
+ */
 export function sortListsByLastProcessDate(lists: HoodTradeTy[][]): HoodTradeTy[] {
   const sortedLists: HoodTradeTy[][] = lists
     .filter(subList => subList.length > 0)
