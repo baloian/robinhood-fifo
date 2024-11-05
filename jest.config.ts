@@ -5,6 +5,7 @@ const config: Config.InitialOptions = {
   transform: {
     '^.+\\.(ts|tsx)$': 'ts-jest'
   },
+  testPathIgnorePatterns: ['/node_modules/', '/dist/']
 };
 
 export default config;
