@@ -1,3 +1,4 @@
+import { round, pctDiff } from '@baloian/lib-ts';
 import ClosingTrade from '../src/closing-trade';
 import { HoodTradeTy } from '../types';
 
@@ -28,6 +29,8 @@ describe('ClosingTrade', () => {
   };
 
   const closingTrade = new ClosingTrade(buyTrade, sellTrade);
+  const buyValue: number = buyTrade.price * buyTrade.quantity;
+  const sellValue: number = sellTrade.price * sellTrade.quantity;
 
   test('constructor initializes properties correctly', () => {
     expect(closingTrade.symbol).toBe('AAPL');
@@ -37,8 +40,8 @@ describe('ClosingTrade', () => {
     expect(closingTrade.sell_price).toBe(165.75);
     expect(closingTrade.buy_process_date).toBe('1/15/2024');
     expect(closingTrade.sell_process_date).toBe('1/20/2024');
-    expect(closingTrade.profit).toBe(152.5); // (165.75 * 10) - (150.50 * 10)
-    expect(closingTrade.profit_pct).toBeCloseTo(10.13, 2); // ((165.75 * 10) / (150.50 * 10) - 1) * 100
+    expect(closingTrade.profit).toBe(round(sellValue - buyValue));
+    expect(closingTrade.profit_pct).toBeCloseTo(pctDiff(sellValue, buyValue));
   });
 
   test('getHoldingTimeMs returns correct time difference', () => {
