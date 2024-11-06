@@ -18,13 +18,6 @@ export function printWithDots(value1: string, value2: string, symbol: string = '
 }
 
 
-export function printHeadline(date: string): void {
-  const d = date.split('/');
-  printWithDots(`### ${numberToMonth(Number(d[0]))} ${d[1]} Monthly Statement`, '', '#');
-  console.log('');
-}
-
-
 export function printHoldings(data: {[key: string]: QueueType<HoodTradeTy>}): void {
   console.log('');
   printWithDots('///// Holdings', '', '');

@@ -14,7 +14,6 @@ import {
   getOrderedHoodMonthsData
 } from './utils';
 import {
-  printHeadline,
   printHoldings,
   printGainLoss
 } from './print';
@@ -40,7 +39,7 @@ export default class RobinhoodFIFO {
     const hoodMonthsData: HoodMonthData[] = getOrderedHoodMonthsData(rows);
     hoodMonthsData.forEach((monthData: HoodMonthData) => {
       this.reset();
-      printHeadline(monthData.getMonthYear());
+      monthData.printHeadline();
       monthData.printMetadata();
       monthData.printBuySellTxs();
       this.processTrades(deepCopy(monthData.getData()));

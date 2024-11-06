@@ -1,4 +1,4 @@
-import { formatToUSD } from '@baloian/lib-ts';
+import { formatToUSD, numberToMonth } from '@baloian/lib-ts';
 import { HoodTradeTy, HoodMonthDataTy, MetaDataTy } from '../types';
 import { dateToMonthYear } from './utils';
 import { printWithDots } from './print';
@@ -99,5 +99,11 @@ export class HoodMonthData implements HoodMonthDataTy {
       ].join(' | ');
       console.log(rowString);
     });
+  }
+
+  printHeadline(): void {
+    const d = this.monthYear.split('/');
+    printWithDots(`### ${numberToMonth(Number(d[0]))} ${d[1]} Monthly Statement`, '', '#');
+    console.log('');
   }
 }
