@@ -60,6 +60,6 @@ export interface HoodMonthDataTy {
 
   getMonthYear(): string;
   getData(): HoodTradeTy[];
-  getMetadatForMonth(): MetaDataTy;
+  getMetadata(): MetaDataTy;
   printMetadata(): void;
 }

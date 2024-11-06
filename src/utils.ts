@@ -3,8 +3,7 @@ import {
   HoodTradeTy,
   ClosingTradeTy,
   GainLossTy,
-  SymbolProfitTy,
-  MetaDataTy
+  SymbolProfitTy
 } from '../types';
 import { HoodMonthData } from './hood-month-data';
 

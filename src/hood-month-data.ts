@@ -25,7 +25,7 @@ export class HoodMonthData implements HoodMonthDataTy {
     return this.data;
   }
 
-  getMetadatForMonth(): MetaDataTy {
+  getMetadata(): MetaDataTy {
     const md: MetaDataTy = {
       fees: 0,
       dividend: 0,
@@ -57,7 +57,7 @@ export class HoodMonthData implements HoodMonthDataTy {
   }
 
   printMetadata(): void {
-    const md: MetaDataTy = this.getMetadatForMonth();
+    const md: MetaDataTy = this.getMetadata();
     if (md.dividend) printWithDots('Dividend', `${formatToUSD(md.dividend)}`);
     if (md.interest) printWithDots('Interest', `${formatToUSD(md.interest)}`);
     if (md.fees) printWithDots('Fees', `${formatToUSD(md.fees)}`);
