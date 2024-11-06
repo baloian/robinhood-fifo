@@ -1,97 +1,68 @@
 import ClosingTrade from '../src/closing-trade';
-import { ClosingTradeTy, HoodTradeTy } from '../types';
+import { HoodTradeTy } from '../types';
+
 
 describe('ClosingTrade', () => {
-  // Sample test data
-  const mockClosingTradeData = new ClosingTrade({
-    symbol: 'AAPL',
-    buy_qty: 10,
-    sell_qty: 10,
-    buy_process_date: '1/1/2024',
-    sell_process_date: '2/1/2024',
-    buy_price: 100,
-    sell_price: 110,
-    profit: 100,
-    profit_pct: 10
-  } as ClosingTradeTy);
-
-  const mockBuyTrade: HoodTradeTy = {
+  const buyTrade: HoodTradeTy = {
     symbol: 'AAPL',
     quantity: 10,
-    price: 100,
-    process_date: '1/1/2024',
-    activity_date: '1/1/2024',
-    settle_date: '1/3/2024',
+    price: 150.50,
+    process_date: '1/15/2024',
+    activity_date: '1/15/2024',
+    settle_date: '1/17/2024',
     description: 'Buy AAPL',
     trans_code: 'Buy',
-    amount: 1000
+    amount: 1505.00
   };
 
-  const mockSellTrade: HoodTradeTy = {
-    symbol: 'AAPL',
+  const sellTrade: HoodTradeTy = {
+    symbol: 'AAPL', 
     quantity: 10,
-    price: 110,
-    process_date: '2/1/2024',
-    activity_date: '2/1/2024', 
-    settle_date: '2/3/2024',
+    price: 165.75,
+    process_date: '1/20/2024',
+    activity_date: '1/20/2024',
+    settle_date: '1/22/2024',
     description: 'Sell AAPL',
     trans_code: 'Sell',
-    amount: 1100
+    amount: 1657.50
   };
 
-  describe('constructor', () => {
-    it('should create instance with correct properties', () => {
-      const trade = new ClosingTrade(mockClosingTradeData);
-      expect(trade).toEqual(mockClosingTradeData);
-    });
+  const closingTrade = new ClosingTrade(buyTrade, sellTrade);
+
+  test('constructor initializes properties correctly', () => {
+    expect(closingTrade.symbol).toBe('AAPL');
+    expect(closingTrade.buy_qty).toBe(10);
+    expect(closingTrade.sell_qty).toBe(10);
+    expect(closingTrade.buy_price).toBe(150.50);
+    expect(closingTrade.sell_price).toBe(165.75);
+    expect(closingTrade.buy_process_date).toBe('1/15/2024');
+    expect(closingTrade.sell_process_date).toBe('1/20/2024');
+    expect(closingTrade.profit).toBe(152.5); // (165.75 * 10) - (150.50 * 10)
+    expect(closingTrade.profit_pct).toBeCloseTo(10.13, 2); // ((165.75 * 10) / (150.50 * 10) - 1) * 100
   });
 
-  describe('static init', () => {
-    it('should create ClosingTrade instance from buy and sell trades', () => {
-      const trade = ClosingTrade.init(mockBuyTrade, mockSellTrade);
-      
-      expect(trade.symbol).toBe('AAPL');
-      expect(trade.buy_qty).toBe(10);
-      expect(trade.sell_qty).toBe(10);
-      expect(trade.buy_price).toBe(100);
-      expect(trade.sell_price).toBe(110);
-      expect(trade.buy_process_date).toBe('1/1/2024');
-      expect(trade.sell_process_date).toBe('2/1/2024');
-      expect(trade.profit).toBe(100);
-      expect(trade.profit_pct).toBeDefined();
-    });
+  test('getHoldingTimeMs returns correct time difference', () => {
+    const expectedMs = 5 * 24 * 60 * 60 * 1000; // 5 days in milliseconds
+    expect(closingTrade.getHoldingTimeMs()).toBe(expectedMs);
   });
 
-  describe('instance methods', () => {
-    let trade: ClosingTrade;
+  test('getProfit returns correct profit', () => {
+    expect(closingTrade.getProfit()).toBe(152.5);
+  });
 
-    beforeEach(() => {
-      trade = new ClosingTrade(mockClosingTradeData);
-    });
+  test('getSymbol returns correct symbol', () => {
+    expect(closingTrade.getSymbol()).toBe('AAPL');
+  });
 
-    it('getHoldingTimeMs should return correct time difference', () => {
-      const expectedMs = new Date('2/1/2024').getTime() - new Date('1/1/2024').getTime();
-      expect(trade.getHoldingTimeMs()).toBe(expectedMs);
-    });
+  test('getInvestment returns correct investment amount', () => {
+    expect(closingTrade.getInvestment()).toBe(1505); // 150.50 * 10
+  });
 
-    it('getProfit should return profit value', () => {
-      expect(trade.getProfit()).toBe(100);
-    });
+  test('getData returns the entire object', () => {
+    expect(closingTrade.getData()).toBe(closingTrade);
+  });
 
-    it('getSymbol should return symbol', () => {
-      expect(trade.getSymbol()).toBe('AAPL');
-    });
-
-    it('getInvestment should return initial investment amount', () => {
-      expect(trade.getInvestment()).toBe(1000); // 100 * 10
-    });
-
-    it('getData should return the entire instance', () => {
-      expect(trade.getData()).toEqual(mockClosingTradeData);
-    });
-
-    it('getProfitPct should return profit percentage', () => {
-      expect(trade.getProfitPct()).toBe(10);
-    });
+  test('getProfitPct returns correct profit percentage', () => {
+    expect(closingTrade.getProfitPct()).toBeCloseTo(10.13, 2);
   });
 });

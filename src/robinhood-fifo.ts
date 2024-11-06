@@ -118,13 +118,13 @@ export default class RobinhoodFIFO {
   private sellFullOrPartially(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): void {
     const symbolQueue = this.gQueue[sellTrade.symbol];
     if (buyTrade.quantity - sellTrade.quantity === 0) {
-      this.txsData.push(ClosingTrade.init(buyTrade, sellTrade));
+      this.txsData.push(new ClosingTrade(buyTrade, sellTrade));
       symbolQueue.pop();
     } else if (buyTrade.quantity - sellTrade.quantity > 0) {
       const tmpBuyTrade: HoodTradeTy = deepCopy(buyTrade);
       tmpBuyTrade.quantity = sellTrade.quantity;
       tmpBuyTrade.amount = round(tmpBuyTrade.quantity * tmpBuyTrade.price);
-      this.txsData.push(ClosingTrade.init(tmpBuyTrade, sellTrade));
+      this.txsData.push(new ClosingTrade(tmpBuyTrade, sellTrade));
       // This would be the remaining part (not sold yet).
       buyTrade.quantity -= sellTrade.quantity;
       buyTrade.amount = round(buyTrade.quantity * buyTrade.price);

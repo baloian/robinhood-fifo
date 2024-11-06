@@ -13,32 +13,18 @@ export default class ClosingTrade implements ClosingTradeTy {
   profit: number;
   profit_pct: number;
 
-  constructor(data: ClosingTradeTy) {
-    this.symbol = data.symbol;
-    this.buy_qty = data.buy_qty;
-    this.sell_qty = data.sell_qty;
-    this.buy_process_date = data.buy_process_date;
-    this.sell_process_date = data.sell_process_date;
-    this.buy_price = data.buy_price;
-    this.sell_price = data.sell_price;
-    this.profit = data.profit;
-    this.profit_pct = data.profit_pct;
-  }
-
-  static init(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): ClosingTradeTy {
+  constructor(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy) {
     const buyValue: number = buyTrade.price * buyTrade.quantity;
     const sellValue: number = sellTrade.price * sellTrade.quantity;
-    return new ClosingTrade({
-      symbol: buyTrade.symbol,
-      buy_qty: buyTrade.quantity,
-      sell_qty: sellTrade.quantity,
-      buy_process_date: buyTrade.process_date,
-      sell_process_date: sellTrade.process_date,
-      buy_price: buyTrade.price,
-      sell_price: sellTrade.price,
-      profit: round(sellValue - buyValue),
-      profit_pct: pctDiff(sellValue, buyValue)
-    } as ClosingTradeTy);
+    this.symbol = buyTrade.symbol;
+    this.buy_qty = buyTrade.quantity;
+    this.sell_qty = sellTrade.quantity;
+    this.buy_process_date = buyTrade.process_date;
+    this.sell_process_date = sellTrade.process_date;
+    this.buy_price = buyTrade.price;
+    this.sell_price = sellTrade.price;
+    this.profit = round(sellValue - buyValue);
+    this.profit_pct = pctDiff(sellValue, buyValue);
   }
 
   getHoldingTimeMs(): number {
