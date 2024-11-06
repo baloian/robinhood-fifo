@@ -6,6 +6,7 @@ import {
   SymbolProfitTy,
   MetaDataTy
 } from '../types';
+import { HoodMonthData } from './hood-month-data';
 
 
 /**
@@ -141,32 +142,19 @@ export function calculateSymbolProfits(data: ClosingTradeTy[], monthYear: string
 }
 
 
-/**
- * Creates a dictionary to store activities for each month using MM/YYYY as the key.
- * This allows retrieving data by month in the main function by using the MM/YYYY format key.
- * For example: monthYearData['01/2024'] would return all trades from January 2024.
- */
-export function getMonthYearData(rows: HoodTradeTy []): {[key: string]: HoodTradeTy[]} {
-  const monthYearData: {[key: string]: HoodTradeTy[]} = {};
+export function getOrderedHoodMonthsData(rows: HoodTradeTy []): HoodMonthData[] {
+  const data: HoodMonthData[] = [];
+  const monthYearData: {[key: string]: boolean} = {};
   for (const row of rows) {
-    const key: string = dateToMonthYear(row.process_date);
-    if (!monthYearData[key]) {
-      monthYearData[key] = getTradesByMonth(rows, key.split('/')[0]);
+    const monthYear: string = dateToMonthYear(row.process_date);
+    if (!monthYearData[monthYear]) {
+      monthYearData[monthYear] = true;
+      data.push(new HoodMonthData(monthYear, getTradesByMonth(rows, monthYear.split('/')[0])));
     }
   }
-  return monthYearData;
-}
-
-
-/**
- * This is needed to make sure we iterate months sequentially so we can handle FIFO trades correctly.
- * For example, if we have trades from 01/2024 and 02/2024, we need to process January before February
- * to maintain the correct order of buys and sells.
- */
-export function sortMonthsAndYears(dates: string[]): string[] {
-  return dates.sort((a, b) => {
-    const [monthA, yearA] = a.split('/').map(Number);
-    const [monthB, yearB] = b.split('/').map(Number);
+  return data.sort((a, b) => {
+    const [monthA, yearA] = a.getMonthYear().split('/').map(Number);
+    const [monthB, yearB] = b.getMonthYear().split('/').map(Number);
     if (yearA !== yearB) return yearA - yearB;
     return monthA - monthB;
   });

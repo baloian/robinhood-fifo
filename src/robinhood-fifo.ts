@@ -10,12 +10,11 @@ import {
   GainLossTy
 } from '../types';
 import {
-  getMonthYearData,
   getMetadatForMonth,
   getTxsForMonth,
   calculateSymbolProfits,
   calculateTotalGainLoss,
-  sortMonthsAndYears
+  getOrderedHoodMonthsData
 } from './utils';
 import {
   printMetadata,
@@ -25,6 +24,7 @@ import {
   printGainLoss
 } from './print';
 import ClosingTrade from './closing-trade';
+import { HoodMonthData } from './hood-month-data';
 
 
 export default class RobinhoodFIFO {
@@ -42,21 +42,20 @@ export default class RobinhoodFIFO {
   }
 
   private processMonthlyStmts(rows: HoodTradeTy[]): void {
-    const monthYearData: {[key: string]: HoodTradeTy[]} = getMonthYearData(rows);
-    const monthYearList: string[] = sortMonthsAndYears(Object.keys(monthYearData));
-    monthYearList.forEach((monthYear: string) => {
+    const hoodMonthsData: HoodMonthData[] = getOrderedHoodMonthsData(rows);
+    hoodMonthsData.forEach(monthData => {
       this.reset();
-      printHeadline(monthYear);
-      const md: MetaDataTy = getMetadatForMonth(monthYearData[monthYear], monthYear);
+      printHeadline(monthData.getMonthYear());
+      const md: MetaDataTy = getMetadatForMonth(monthData.getData(), monthData.getMonthYear());
       printMetadata(md);
-      const txs: HoodTradeTy[] = getTxsForMonth(monthYearData[monthYear], monthYear);
+      const txs: HoodTradeTy[] = getTxsForMonth(monthData.getData(), monthData.getMonthYear());
       printTxs(txs);
-      this.processTrades(deepCopy(monthYearData[monthYear]));
+      this.processTrades(deepCopy(monthData.getData()));
       printHoldings(this.gQueue);
       this.reset();
-      this.processTrades(deepCopy(monthYearData[monthYear]));
-      const symbolProfits: SymbolProfitTy[] = calculateSymbolProfits(this.txsData, monthYear);
-      const totalGainLoss: GainLossTy = calculateTotalGainLoss(this.txsData, monthYear);
+      this.processTrades(deepCopy(monthData.getData()));
+      const symbolProfits: SymbolProfitTy[] = calculateSymbolProfits(this.txsData, monthData.getMonthYear());
+      const totalGainLoss: GainLossTy = calculateTotalGainLoss(this.txsData, monthData.getMonthYear());
       printGainLoss(symbolProfits, totalGainLoss);
       console.log('\n\n\n\n\n');
     });

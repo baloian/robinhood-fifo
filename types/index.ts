@@ -53,3 +53,11 @@ export interface GainLossTy {
   long_term_profit: number;
   short_term_profit: number;
 }
+
+export interface HoodMonthDataTy {
+  monthYear: string;
+  data: HoodTradeTy[];
+
+  getMonthYear(): string;
+  getData(): HoodTradeTy[];
+}
