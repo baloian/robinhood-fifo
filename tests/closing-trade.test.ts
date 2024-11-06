@@ -42,7 +42,9 @@ describe('ClosingTrade', () => {
   });
 
   test('getHoldingTimeMs returns correct time difference', () => {
-    const expectedMs = 5 * 24 * 60 * 60 * 1000; // 5 days in milliseconds
+    const buyDate = new Date('1/15/2024');
+    const sellDate = new Date('1/20/2024');
+    const expectedMs = sellDate.getTime() - buyDate.getTime();
     expect(closingTrade.getHoldingTimeMs()).toBe(expectedMs);
   });
 
