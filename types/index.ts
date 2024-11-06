@@ -21,6 +21,12 @@ export interface ClosingTradeTy {
   sell_price: number;
   profit: number;
   profit_pct: number;
+
+  getHoldingTimeMs(): number;
+  getProfit(): number;
+  getSymbol(): string;
+  getInvestment(): number;
+  getData(): ClosingTradeTy;
 };
 
 

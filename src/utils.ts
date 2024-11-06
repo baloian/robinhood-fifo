@@ -1,4 +1,5 @@
 import { round, pctDiff } from '@baloian/lib-ts';
+import ClosingTrade from './closing-trade';
 import {
   HoodTradeTy,
   ClosingTradeTy,
@@ -50,7 +51,7 @@ export function dateToMonthYear(dateString: string): string {
 export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): ClosingTradeTy {
   const buyValue: number = buyTrade.price * buyTrade.quantity;
   const sellValue: number = sellTrade.price * sellTrade.quantity;
-  return {
+  return new ClosingTrade({
     symbol: buyTrade.symbol,
     buy_qty: buyTrade.quantity,
     sell_qty: sellTrade.quantity,
@@ -60,7 +61,7 @@ export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): C
     sell_price: sellTrade.price,
     profit: round(sellValue - buyValue),
     profit_pct: pctDiff(sellValue, buyValue)
-  };
+  } as ClosingTradeTy);
 }
 
 
@@ -122,11 +123,8 @@ export function calculateTotalGainLoss(data: ClosingTradeTy[], monthYear: string
   const MS_PER_DAY = 24 * 60 * 60 * 1000;
   const DAYS_PER_YEAR = 365;
   const ONE_YEAR_MS = DAYS_PER_YEAR * MS_PER_DAY;
-  trades.forEach((trade) => {
-    const buyDate = new Date(trade.buy_process_date);
-    const sellDate = new Date(trade.sell_process_date);
-    const holdingPeriodMs = sellDate.getTime() - buyDate.getTime();
-    if (holdingPeriodMs > ONE_YEAR_MS) {
+  trades.forEach((trade: ClosingTradeTy) => {
+    if (trade.getHoldingTimeMs() > ONE_YEAR_MS) {
       profitSummary.long_term_profit += trade.profit;
     } else {
       profitSummary.short_term_profit += trade.profit;
@@ -143,7 +141,7 @@ export function calculateSymbolProfits(data: ClosingTradeTy[], monthYear: string
   const trades = data.filter(d => dateToMonthYear(d.sell_process_date) === monthYear);
   const result: {[key: string]: {total_profit: number; total_profit_pct: number}} = {};
   trades.forEach(trade => {
-    const investment = trade.buy_qty * trade.buy_price;
+    const investment = trade.getInvestment();
     if (!result[trade.symbol]) result[trade.symbol] = {total_profit: 0, total_profit_pct: 0};
     const symbolData = result[trade.symbol];
     symbolData.total_profit += trade.profit;
