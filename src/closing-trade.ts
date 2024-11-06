@@ -45,4 +45,8 @@ export default class ClosingTrade implements ClosingTradeTy {
   getData(): ClosingTradeTy {
     return this;
   }
+
+  getProfitPct(): number {
+    return this.profit_pct;
+  }
 }

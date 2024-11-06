@@ -140,15 +140,15 @@ export function calculateTotalGainLoss(data: ClosingTradeTy[], monthYear: string
 export function calculateSymbolProfits(data: ClosingTradeTy[], monthYear: string): SymbolProfitTy[] {
   const trades = data.filter(d => dateToMonthYear(d.sell_process_date) === monthYear);
   const result: {[key: string]: {total_profit: number; total_profit_pct: number}} = {};
-  trades.forEach(trade => {
+  trades.forEach((trade: ClosingTradeTy) => {
     const investment = trade.getInvestment();
-    if (!result[trade.symbol]) result[trade.symbol] = {total_profit: 0, total_profit_pct: 0};
-    const symbolData = result[trade.symbol];
-    symbolData.total_profit += trade.profit;
+    if (!result[trade.getSymbol()]) result[trade.getSymbol()] = {total_profit: 0, total_profit_pct: 0};
+    const symbolData = result[trade.getSymbol()];
+    symbolData.total_profit += trade.getProfit();
     const totalInvestment = (symbolData.total_profit_pct * symbolData.total_profit) + investment;
     symbolData.total_profit_pct = (
       (symbolData.total_profit_pct * (totalInvestment - investment)) +
-      (trade.profit_pct * investment)
+      (trade.getProfitPct() * investment)
     ) / totalInvestment;
   });
   return Object.keys(result).map(symbol => ({
