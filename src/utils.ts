@@ -1,5 +1,4 @@
-import { round, pctDiff } from '@baloian/lib-ts';
-import ClosingTrade from './closing-trade';
+import { round } from '@baloian/lib-ts';
 import {
   HoodTradeTy,
   ClosingTradeTy,
