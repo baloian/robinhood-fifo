@@ -10,14 +10,12 @@ import {
   GainLossTy
 } from '../types';
 import {
-  getMetadatForMonth,
   getTxsForMonth,
   calculateSymbolProfits,
   calculateTotalGainLoss,
   getOrderedHoodMonthsData
 } from './utils';
 import {
-  printMetadata,
   printHeadline,
   printTxs,
   printHoldings,
@@ -43,11 +41,10 @@ export default class RobinhoodFIFO {
 
   private processMonthlyStmts(rows: HoodTradeTy[]): void {
     const hoodMonthsData: HoodMonthData[] = getOrderedHoodMonthsData(rows);
-    hoodMonthsData.forEach(monthData => {
+    hoodMonthsData.forEach((monthData: HoodMonthData) => {
       this.reset();
       printHeadline(monthData.getMonthYear());
-      const md: MetaDataTy = getMetadatForMonth(monthData.getData(), monthData.getMonthYear());
-      printMetadata(md);
+      monthData.printMetadata();
       const txs: HoodTradeTy[] = getTxsForMonth(monthData.getData(), monthData.getMonthYear());
       printTxs(txs);
       this.processTrades(deepCopy(monthData.getData()));

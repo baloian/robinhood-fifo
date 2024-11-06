@@ -2,7 +2,7 @@ import { formatToUSD, QueueType, numberToMonth } from '@baloian/lib-ts';
 import { MetaDataTy, HoodTradeTy, SymbolProfitTy, GainLossTy } from '../types';
 
 
-function printWithDots(value1: string, value2: string, symbol: string = '-'): void {
+export function printWithDots(value1: string, value2: string, symbol: string = '-'): void {
   const totalLength = 78;
   const totalValuesLength = value1.length + value2.length;
   const totalDots = totalLength - totalValuesLength;
@@ -15,18 +15,6 @@ function printWithDots(value1: string, value2: string, symbol: string = '-'): vo
   const line: string = `${value1} ${symbol.repeat(totalDots)}` +
     (value2.length > 0 ? ` ${value2}` : symbol);
   console.log(line);
-}
-
-
-export function printMetadata(data: MetaDataTy): void {
-  printWithDots('Dividend', `${formatToUSD(data.dividend)}`);
-  printWithDots('Interest', `${formatToUSD(data.interest)}`);
-  printWithDots('Fees', `${formatToUSD(data.fees)}`);
-  printWithDots('Deposit', `${formatToUSD(data.deposit)}`);
-  printWithDots('Withdrawal', `${formatToUSD(data.withdrawal)}`);
-  if (data.benefit) printWithDots('Benefit', `${formatToUSD(data.benefit)}`);
-  if (data.acats) printWithDots('ACATS Transfer', `${formatToUSD(data.acats)}`);
-  console.log('');
 }
 
 

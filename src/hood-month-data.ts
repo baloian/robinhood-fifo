@@ -1,4 +1,7 @@
-import { HoodTradeTy, HoodMonthDataTy } from '../types';
+import { formatToUSD } from '@baloian/lib-ts';
+import { HoodTradeTy, HoodMonthDataTy, MetaDataTy } from '../types';
+import { dateToMonthYear } from './utils';
+import { printWithDots } from './print';
 
 
 export class HoodMonthData implements HoodMonthDataTy {
@@ -20,5 +23,48 @@ export class HoodMonthData implements HoodMonthDataTy {
 
   getData(): HoodTradeTy[] {
     return this.data;
+  }
+
+  getMetadatForMonth(): MetaDataTy {
+    const md: MetaDataTy = {
+      fees: 0,
+      dividend: 0,
+      deposit: 0,
+      withdrawal: 0,
+      interest: 0,
+      benefit: 0,
+      acats: 0
+    };
+    const transCodeMap: { [key: string]: keyof typeof md } = {
+      GOLD: 'fees',
+      MINT: 'fees',
+      CDIV: 'dividend',
+      ACATI: 'acats',
+      GDBP: 'benefit',
+      'T/A': 'benefit'
+    };
+    this.data.forEach((row: HoodTradeTy) => {
+      if (this.monthYear !== dateToMonthYear(row.process_date)) return;
+      const property = transCodeMap[row.trans_code];
+      if (property) {
+        md[property] += row.amount;
+      } else if (row.trans_code === 'ACH') {
+        if (row.description === 'ACH Deposit') md.deposit += row.amount;
+        if (row.description === 'ACH Withdrawal') md.withdrawal += row.amount;
+      }
+    })
+    return md;
+  }
+
+  printMetadata(): void {
+    const md: MetaDataTy = this.getMetadatForMonth();
+    if (md.dividend) printWithDots('Dividend', `${formatToUSD(md.dividend)}`);
+    if (md.interest) printWithDots('Interest', `${formatToUSD(md.interest)}`);
+    if (md.fees) printWithDots('Fees', `${formatToUSD(md.fees)}`);
+    if (md.deposit) printWithDots('Deposit', `${formatToUSD(md.deposit)}`);
+    if (md.withdrawal) printWithDots('Withdrawal', `${formatToUSD(md.withdrawal)}`);
+    if (md.benefit) printWithDots('Benefit', `${formatToUSD(md.benefit)}`);
+    if (md.acats) printWithDots('ACATS Transfer', `${formatToUSD(md.acats)}`);
+    console.log('');
   }
 }

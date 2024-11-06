@@ -55,40 +55,6 @@ export function getTradesByMonth(rows: HoodTradeTy [], month: string): HoodTrade
 }
 
 
-export function getMetadatForMonth(rows: HoodTradeTy [], monthYear: string): MetaDataTy {
-  const data: MetaDataTy = {
-    fees: 0,
-    dividend: 0,
-    deposit: 0,
-    withdrawal: 0,
-    interest: 0,
-    benefit: 0,
-    acats: 0
-  };
-
-  const transCodeMap: { [key: string]: keyof typeof data } = {
-    GOLD: 'fees',
-    MINT: 'fees',
-    CDIV: 'dividend',
-    ACATI: 'acats',
-    GDBP: 'benefit',
-    'T/A': 'benefit'
-  };
-
-  rows.forEach((row: HoodTradeTy) => {
-    if (monthYear !== dateToMonthYear(row.process_date)) return;
-    const property = transCodeMap[row.trans_code];
-    if (property) {
-      data[property] += row.amount;
-    } else if (row.trans_code === 'ACH') {
-      if (row.description === 'ACH Deposit') data.deposit += row.amount;
-      if (row.description === 'ACH Withdrawal') data.withdrawal += row.amount;
-    }
-  })
-  return data;
-}
-
-
 export function getTxsForMonth(rows: HoodTradeTy[], monthYear: string): HoodTradeTy[] {
   return rows.filter(row =>
       monthYear === dateToMonthYear(row.process_date) &&
