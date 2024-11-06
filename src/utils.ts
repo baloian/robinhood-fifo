@@ -119,18 +119,23 @@ export function calculateTotalGainLoss(data: ClosingTradeTy[], monthYear: string
     long_term_profit: 0,
     short_term_profit: 0
   };
+  const MS_PER_DAY = 24 * 60 * 60 * 1000;
+  const DAYS_PER_YEAR = 365;
+  const ONE_YEAR_MS = DAYS_PER_YEAR * MS_PER_DAY;
   trades.forEach((trade) => {
     const buyDate = new Date(trade.buy_process_date);
     const sellDate = new Date(trade.sell_process_date);
-    const timeDifference = sellDate.getTime() - buyDate.getTime();
-    const oneYearInMilliseconds = 365 * 24 * 60 * 60 * 1000;
-    if (timeDifference > oneYearInMilliseconds) {
+    const holdingPeriodMs = sellDate.getTime() - buyDate.getTime();
+    if (holdingPeriodMs > ONE_YEAR_MS) {
       profitSummary.long_term_profit += trade.profit;
     } else {
       profitSummary.short_term_profit += trade.profit;
     }
   });
-  return profitSummary;
+  return {
+    long_term_profit: round(profitSummary.long_term_profit),
+    short_term_profit: round(profitSummary.short_term_profit)
+  };
 }
 
 
