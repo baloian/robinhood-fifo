@@ -54,14 +54,6 @@ export function getTradesByMonth(rows: HoodTradeTy [], month: string): HoodTrade
 }
 
 
-export function getTxsForMonth(rows: HoodTradeTy[], monthYear: string): HoodTradeTy[] {
-  return rows.filter(row =>
-      monthYear === dateToMonthYear(row.process_date) &&
-      (row.trans_code === 'Sell' || row.trans_code === 'Buy')
-  );
-}
-
-
 export function calculateTotalGainLoss(data: ClosingTradeTy[], monthYear: string): GainLossTy {
   const trades = data.filter(d => dateToMonthYear(d.sell_process_date) === monthYear);
   const profitSummary: GainLossTy = {

@@ -5,19 +5,16 @@ import Parser from './parser';
 import {
   HoodTradeTy,
   ClosingTradeTy,
-  MetaDataTy,
   SymbolProfitTy,
   GainLossTy
 } from '../types';
 import {
-  getTxsForMonth,
   calculateSymbolProfits,
   calculateTotalGainLoss,
   getOrderedHoodMonthsData
 } from './utils';
 import {
   printHeadline,
-  printTxs,
   printHoldings,
   printGainLoss
 } from './print';
@@ -45,8 +42,7 @@ export default class RobinhoodFIFO {
       this.reset();
       printHeadline(monthData.getMonthYear());
       monthData.printMetadata();
-      const txs: HoodTradeTy[] = getTxsForMonth(monthData.getData(), monthData.getMonthYear());
-      printTxs(txs);
+      monthData.printBuySellTxs();
       this.processTrades(deepCopy(monthData.getData()));
       printHoldings(this.gQueue);
       this.reset();

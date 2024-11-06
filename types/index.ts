@@ -62,4 +62,6 @@ export interface HoodMonthDataTy {
   getData(): HoodTradeTy[];
   getMetadata(): MetaDataTy;
   printMetadata(): void;
+  getBuySellTxs(): HoodTradeTy[];
+  printBuySellTxs(): void;
 }
