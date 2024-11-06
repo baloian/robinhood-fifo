@@ -63,10 +63,18 @@ export default class RobinhoodFIFO {
   }
 
   private processTrades(rows: HoodTradeTy[]): void {
-    for (const trade of rows) {
-      if (trade.trans_code === 'Buy') this.processBuyTrade(trade);
-      else if (trade.trans_code === 'Sell') this.processSellTrade(trade);
-    }
+    rows.forEach(trade => {
+      switch (trade.trans_code) {
+        case 'Buy':
+          this.processBuyTrade(trade);
+          break;
+        case 'Sell':
+          this.processSellTrade(trade);
+          break;
+        default:
+          break;
+      }
+    });
   }
 
   private processBuyTrade(trade: HoodTradeTy): void {
