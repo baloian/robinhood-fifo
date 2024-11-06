@@ -48,23 +48,6 @@ export function dateToMonthYear(dateString: string): string {
 }
 
 
-export function getTradeRecord(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): ClosingTradeTy {
-  const buyValue: number = buyTrade.price * buyTrade.quantity;
-  const sellValue: number = sellTrade.price * sellTrade.quantity;
-  return new ClosingTrade({
-    symbol: buyTrade.symbol,
-    buy_qty: buyTrade.quantity,
-    sell_qty: sellTrade.quantity,
-    buy_process_date: buyTrade.process_date,
-    sell_process_date: sellTrade.process_date,
-    buy_price: buyTrade.price,
-    sell_price: sellTrade.price,
-    profit: round(sellValue - buyValue),
-    profit_pct: pctDiff(sellValue, buyValue)
-  } as ClosingTradeTy);
-}
-
-
 export function getTradesByMonth(rows: HoodTradeTy [], month: string): HoodTradeTy [] {
   return rows.filter(row =>
     row.process_date &&

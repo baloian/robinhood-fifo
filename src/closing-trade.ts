@@ -1,4 +1,5 @@
-import { ClosingTradeTy } from '../types';
+import { round, pctDiff } from '@baloian/lib-ts';
+import { ClosingTradeTy, HoodTradeTy } from '../types';
 
 
 export default class ClosingTrade implements ClosingTradeTy {
@@ -22,6 +23,22 @@ export default class ClosingTrade implements ClosingTradeTy {
     this.sell_price = data.sell_price;
     this.profit = data.profit;
     this.profit_pct = data.profit_pct;
+  }
+
+  static init(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): ClosingTradeTy {
+    const buyValue: number = buyTrade.price * buyTrade.quantity;
+    const sellValue: number = sellTrade.price * sellTrade.quantity;
+    return new ClosingTrade({
+      symbol: buyTrade.symbol,
+      buy_qty: buyTrade.quantity,
+      sell_qty: sellTrade.quantity,
+      buy_process_date: buyTrade.process_date,
+      sell_process_date: sellTrade.process_date,
+      buy_price: buyTrade.price,
+      sell_price: sellTrade.price,
+      profit: round(sellValue - buyValue),
+      profit_pct: pctDiff(sellValue, buyValue)
+    } as ClosingTradeTy);
   }
 
   getHoldingTimeMs(): number {

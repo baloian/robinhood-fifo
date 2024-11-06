@@ -10,7 +10,6 @@ import {
   GainLossTy
 } from '../types';
 import {
-  getTradeRecord,
   getMonthYearData,
   getMetadatForMonth,
   getTxsForMonth,
@@ -25,6 +24,7 @@ import {
   printHoldings,
   printGainLoss
 } from './print';
+import ClosingTrade from './closing-trade';
 
 
 export default class RobinhoodFIFO {
@@ -118,13 +118,13 @@ export default class RobinhoodFIFO {
   private sellFullOrPartially(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): void {
     const symbolQueue = this.gQueue[sellTrade.symbol];
     if (buyTrade.quantity - sellTrade.quantity === 0) {
-      this.txsData.push(getTradeRecord(buyTrade, sellTrade));
+      this.txsData.push(ClosingTrade.init(buyTrade, sellTrade));
       symbolQueue.pop();
     } else if (buyTrade.quantity - sellTrade.quantity > 0) {
       const tmpBuyTrade: HoodTradeTy = deepCopy(buyTrade);
       tmpBuyTrade.quantity = sellTrade.quantity;
       tmpBuyTrade.amount = round(tmpBuyTrade.quantity * tmpBuyTrade.price);
-      this.txsData.push(getTradeRecord(tmpBuyTrade, sellTrade));
+      this.txsData.push(ClosingTrade.init(tmpBuyTrade, sellTrade));
       // This would be the remaining part (not sold yet).
       buyTrade.quantity -= sellTrade.quantity;
       buyTrade.amount = round(buyTrade.quantity * buyTrade.price);
