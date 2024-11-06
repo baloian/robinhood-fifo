@@ -134,8 +134,6 @@ export function calculateTotalGainLoss(data: ClosingTradeTy[], monthYear: string
 }
 
 
-// Note that this calculates percentage as weighted average of profit percentages based on
-// the size of the investments.
 export function calculateSymbolProfits(data: ClosingTradeTy[], monthYear: string): SymbolProfitTy[] {
   const trades = data.filter(d => dateToMonthYear(d.sell_process_date) === monthYear);
   const result: {[key: string]: {total_profit: number; total_profit_pct: number}} = {};
@@ -158,6 +156,11 @@ export function calculateSymbolProfits(data: ClosingTradeTy[], monthYear: string
 }
 
 
+/**
+ * Creates a dictionary to store activities for each month using MM/YYYY as the key.
+ * This allows retrieving data by month in the main function by using the MM/YYYY format key.
+ * For example: monthYearData['01/2024'] would return all trades from January 2024.
+ */
 export function getMonthYearData(rows: HoodTradeTy []): {[key: string]: HoodTradeTy[]} {
   const monthYearData: {[key: string]: HoodTradeTy[]} = {};
   for (const row of rows) {
@@ -170,6 +173,11 @@ export function getMonthYearData(rows: HoodTradeTy []): {[key: string]: HoodTrad
 }
 
 
+/**
+ * This is needed to make sure we iterate months sequentially so we can handle FIFO trades correctly.
+ * For example, if we have trades from 01/2024 and 02/2024, we need to process January before February
+ * to maintain the correct order of buys and sells.
+ */
 export function sortMonthsAndYears(dates: string[]): string[] {
   return dates.sort((a, b) => {
     const [monthA, yearA] = a.split('/').map(Number);
