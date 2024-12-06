@@ -19,6 +19,7 @@ export function printWithDots(value1: string, value2: string, symbol: string = '
 
 
 export function printHoldings(data: {[key: string]: QueueType<HoodTradeTy>}): void {
+  if (Object.keys(data).length === 0 || Object.values(data).every(queue => queue.isEmpty())) return;
   console.log('');
   printWithDots('///// Holdings', '', '');
   console.log('-----');
