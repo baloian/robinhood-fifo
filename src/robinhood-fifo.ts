@@ -40,8 +40,9 @@ export default class RobinhoodFIFO {
     hoodMonthsData.forEach((monthData: HoodMonthData) => {
       this.reset();
       monthData.printHeadline();
-      monthData.printMetadata();
       monthData.printBuySellTxs();
+      console.log('\n');
+      monthData.printMetadata();
       this.processTrades(deepCopy(monthData.getData()));
       printHoldings(this.gQueue);
       this.reset();
