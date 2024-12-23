@@ -1,6 +1,7 @@
 import { formatToUSD } from '@baloian/lib-ts';
-import { SymbolProfitTy, GainLossTy } from '../types';
+import { SymbolProfitTy, GainLossTy, HoodTradeTy } from '../types';
 import { HoodQueue } from './hood-queue';
+import { LinkedList } from 'typescript-ds-lib';
 
 
 export function printWithDots(value1: string, value2: string, symbol: string = '-'): void {
@@ -21,21 +22,15 @@ export function printWithDots(value1: string, value2: string, symbol: string = '
 
 export function printHoldings(data: HoodQueue): void {
   if (data.size() === 0) return;
-  // if (Object.values(data.getData()).every(queue => queue.isEmpty())) return;
+  if (Object.values(data.getData()).every((list: LinkedList<HoodTradeTy>) => list.isEmpty())) return;
   console.log('');
   printWithDots('///// Holdings', '', '');
   console.log('-----');
-  /*
-  Object.keys(data).forEach((symbol: string) => {
-    if (!data[symbol].isEmpty()) {
-      const holdingData = data[symbol].getList().reduce((acc, trade) => {
-        acc[trade.symbol] = (acc[trade.symbol] || 0) + trade.quantity;
-        return acc;
-      }, {} as { [key: string]: number });
-      Object.keys(holdingData).forEach((s: string) => printWithDots(s, `${holdingData[s]}`));
+  data.forEach((symbol: string, list: LinkedList<HoodTradeTy>) => {
+    if (!list.isEmpty()) {
+      printWithDots(symbol, `${data.getQty(symbol)}`);
     }
   });
-  */
 }
 
 
