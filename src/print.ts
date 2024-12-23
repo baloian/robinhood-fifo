@@ -1,5 +1,7 @@
 import { formatToUSD, QueueType, numberToMonth } from '@baloian/lib-ts';
 import { HoodTradeTy, SymbolProfitTy, GainLossTy } from '../types';
+import { HoodQueue } from './hood-queue';
+import { LinkedList } from 'typescript-ds-lib';
 
 
 export function printWithDots(value1: string, value2: string, symbol: string = '-'): void {
@@ -18,11 +20,13 @@ export function printWithDots(value1: string, value2: string, symbol: string = '
 }
 
 
-export function printHoldings(data: {[key: string]: QueueType<HoodTradeTy>}): void {
-  if (Object.keys(data).length === 0 || Object.values(data).every(queue => queue.isEmpty())) return;
+export function printHoldings(data: HoodQueue): void {
+  if (data.size() === 0) return;
+  // if (Object.values(data.getData()).every(queue => queue.isEmpty())) return;
   console.log('');
   printWithDots('///// Holdings', '', '');
   console.log('-----');
+  /*
   Object.keys(data).forEach((symbol: string) => {
     if (!data[symbol].isEmpty()) {
       const holdingData = data[symbol].getList().reduce((acc, trade) => {
@@ -32,6 +36,7 @@ export function printHoldings(data: {[key: string]: QueueType<HoodTradeTy>}): vo
       Object.keys(holdingData).forEach((s: string) => printWithDots(s, `${holdingData[s]}`));
     }
   });
+  */
 }
 
 
