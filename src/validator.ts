@@ -1,4 +1,3 @@
-import { getTotalQty } from './utils';
 import { HoodQueue } from './hood-queue';
 
 

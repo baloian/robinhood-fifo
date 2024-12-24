@@ -117,11 +117,3 @@ export function getOrderedHoodMonthsData(rows: HoodTradeTy []): HoodMonthData[] 
   });
 }
 
-
-export function getTotalQty(items: HoodTradeTy[]): number {
-  let total: number = 0;
-  items.forEach((e: HoodTradeTy) => {
-    if (e.quantity) total += e.quantity;
-  });
-  return total;
-}
