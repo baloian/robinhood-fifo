@@ -4,7 +4,6 @@ import Validator from './validator';
 import Parser from './parser';
 import {
   HoodTradeTy,
-  ClosingTradeTy,
   SymbolProfitTy,
   GainLossTy
 } from '../types';
@@ -17,15 +16,15 @@ import {
   printHoldings,
   printGainLoss
 } from './print';
-import ClosingTrade from './closing-trade';
 import { HoodMonthData } from './hood-month-data';
 import { HoodQueue } from './hood-queue';
+import { ClosingTrade } from './closing-trade';
 
 
 export default class RobinhoodFIFO {
   // Queue storing orders for each symbol using FIFO (First In, First Out) order.
   private hoodQueue: HoodQueue = new HoodQueue();
-  private txsData: ClosingTradeTy[] = [];
+  private txsData: ClosingTrade[] = [];
 
   async run(): Promise<void> {
     try {

@@ -1,11 +1,11 @@
 import { round } from '@baloian/lib-ts';
 import {
   HoodTradeTy,
-  ClosingTradeTy,
   GainLossTy,
   SymbolProfitTy
 } from '../types';
 import { HoodMonthData } from './hood-month-data';
+import { ClosingTrade } from './closing-trade';
 
 
 /**
@@ -54,7 +54,7 @@ export function getTradesByMonth(rows: HoodTradeTy [], month: string): HoodTrade
 }
 
 
-export function calculateTotalGainLoss(data: ClosingTradeTy[], monthYear: string): GainLossTy {
+export function calculateTotalGainLoss(data: ClosingTrade[], monthYear: string): GainLossTy {
   const trades = data.filter(d => dateToMonthYear(d.sell_process_date) === monthYear);
   const profitSummary: GainLossTy = {
     long_term_profit: 0,
@@ -63,7 +63,7 @@ export function calculateTotalGainLoss(data: ClosingTradeTy[], monthYear: string
   const MS_PER_DAY = 24 * 60 * 60 * 1000;
   const DAYS_PER_YEAR = 365;
   const ONE_YEAR_MS = DAYS_PER_YEAR * MS_PER_DAY;
-  trades.forEach((trade: ClosingTradeTy) => {
+  trades.forEach((trade: ClosingTrade) => {
     if (trade.getHoldingTimeMs() > ONE_YEAR_MS) {
       profitSummary.long_term_profit += trade.profit;
     } else {
@@ -77,10 +77,10 @@ export function calculateTotalGainLoss(data: ClosingTradeTy[], monthYear: string
 }
 
 
-export function calculateSymbolProfits(data: ClosingTradeTy[], monthYear: string): SymbolProfitTy[] {
+export function calculateSymbolProfits(data: ClosingTrade[], monthYear: string): SymbolProfitTy[] {
   const trades = data.filter(d => dateToMonthYear(d.sell_process_date) === monthYear);
   const result: {[key: string]: {total_profit: number; total_profit_pct: number}} = {};
-  trades.forEach((trade: ClosingTradeTy) => {
+  trades.forEach((trade: ClosingTrade) => {
     const investment = trade.getInvestment();
     if (!result[trade.getSymbol()]) result[trade.getSymbol()] = {total_profit: 0, total_profit_pct: 0};
     const symbolData = result[trade.getSymbol()];

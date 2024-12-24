@@ -1,9 +1,8 @@
 import { calculateTotalGainLoss } from '../src/utils';
-import { ClosingTradeTy } from '../types';
-import ClosingTrade from '../src/closing-trade';
+import { ClosingTrade } from '../src/closing-trade';
 
 describe('calculateTotalGainLoss', () => {
-  const sampleTrades: ClosingTradeTy[] = [
+  const sampleTrades: ClosingTrade[] = [
     // Short-term trade (6 months)
     new ClosingTrade(
       {
@@ -106,7 +105,7 @@ describe('calculateTotalGainLoss', () => {
   });
 
   it('handle multiple trades in the same month', () => {
-    const multipleTradesMonth: ClosingTradeTy[] = [
+    const multipleTradesMonth: ClosingTrade[] = [
       ...sampleTrades,
       new ClosingTrade(
         {

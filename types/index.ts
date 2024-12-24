@@ -11,26 +11,6 @@ export interface HoodTradeTy {
 };
 
 
-export interface ClosingTradeTy {
-  symbol: string;
-  buy_qty: number;
-  sell_qty: number;
-  buy_process_date: string;
-  sell_process_date: string;
-  buy_price: number;
-  sell_price: number;
-  profit: number;
-  profit_pct: number;
-
-  getHoldingTimeMs(): number;
-  getProfit(): number;
-  getProfitPct(): number;
-  getSymbol(): string;
-  getInvestment(): number;
-  getData(): ClosingTradeTy;
-};
-
-
 export interface SymbolProfitTy {
   symbol: string;
   total_profit: number;
