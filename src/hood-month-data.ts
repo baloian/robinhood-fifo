@@ -1,10 +1,24 @@
 import { formatToUSD, numberToMonth } from '@baloian/lib-ts';
-import { HoodTradeTy, HoodMonthDataTy, MetaDataTy } from '../types';
+import { HoodTradeTy, MetaDataTy } from '../types';
 import { dateToMonthYear } from './utils';
 import { printWithDots } from './print';
 
 
-export class HoodMonthData implements HoodMonthDataTy {
+export interface HoodMonthData {
+  monthYear: string;
+  data: HoodTradeTy[];
+
+  getMonthYear(): string;
+  getData(): HoodTradeTy[];
+  getMetadata(): MetaDataTy;
+  printMetadata(): void;
+  getBuySellTxs(): HoodTradeTy[];
+  printBuySellTxs(): void;
+  printHeadline(): void;
+}
+
+
+export class HoodMonthData implements HoodMonthData {
   monthYear: string;
   /** 
    * Contains both current month data and previous months' data.
