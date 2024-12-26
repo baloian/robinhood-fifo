@@ -2,11 +2,14 @@ import { LinkedList } from 'typescript-ds-lib';
 import { HoodTradeTy } from '../types';
 
 
+type HoodQueueData = {[key: string]: LinkedList<HoodTradeTy>};
+
+
 export interface HoodQueue {
   push(symbol: string, trade: HoodTradeTy): void;
   pop(symbol: string): HoodTradeTy | undefined;
   front(symbol: string): HoodTradeTy | undefined;
-  getData(): {[key: string]: LinkedList<HoodTradeTy>};
+  getData(): HoodQueueData;
   forEach(callback: (symbol: string, list: LinkedList<HoodTradeTy>) => void): void;
   getQty(symbol: string): number;
   size(): number;
@@ -15,7 +18,7 @@ export interface HoodQueue {
 
 
 export class HoodQueue implements HoodQueue {
-  private data: {[key: string]: LinkedList<HoodTradeTy>} = {};
+  private data: HoodQueueData = {};
 
   push(symbol: string, trade: HoodTradeTy): void {
     if (!this.data[symbol]) this.data[symbol] = new LinkedList<HoodTradeTy>();
@@ -34,7 +37,7 @@ export class HoodQueue implements HoodQueue {
     return list.front();
   }
 
-  getData(): {[key: string]: LinkedList<HoodTradeTy>} {
+  getData(): HoodQueueData {
     return this.data;
   }
 
