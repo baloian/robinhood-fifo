@@ -23,13 +23,13 @@ export class HoodQueue implements HoodQueue {
   }
 
   pop(symbol: string): HoodTradeTy | undefined {
-    const list = this.data[symbol];
+    const list: LinkedList<HoodTradeTy> | undefined = this.data[symbol];
     if (!list) return undefined;
     return list.popFront();
   }
 
   front(symbol: string): HoodTradeTy | undefined {
-    const list = this.data[symbol];
+    const list: LinkedList<HoodTradeTy> | undefined = this.data[symbol];
     if (!list) return undefined;
     return list.front();
   }
@@ -43,7 +43,7 @@ export class HoodQueue implements HoodQueue {
   }
 
   getQty(symbol: string): number {
-    const list = this.data[symbol];
+    const list: LinkedList<HoodTradeTy> | undefined = this.data[symbol];
     if (!list) return 0;
     let total: number = 0;
     list.forEach((trade: HoodTradeTy) => {
@@ -57,7 +57,7 @@ export class HoodQueue implements HoodQueue {
   }
 
   isEmpty(symbol: string): boolean {
-    const list = this.data[symbol];
+    const list: LinkedList<HoodTradeTy> | undefined = this.data[symbol];
     if (!list) return true;
     return list.isEmpty();
   }
