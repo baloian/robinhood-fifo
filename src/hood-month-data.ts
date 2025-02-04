@@ -64,6 +64,7 @@ export class HoodMonthData implements HoodMonthData {
       GOLD: 'fees',
       MINT: 'fees',
       CDIV: 'dividend',
+      MDIV: 'dividend',
       ACATI: 'acats',
       GDBP: 'benefit',
       'T/A': 'benefit'
