@@ -20,6 +20,25 @@ export function convertToNumber(value: string): number {
 
 
 /**
+ * Compares two dates in MM/YYYY format and determines if the first date is less than or equal to the second date.
+ * date1 - First date in MM/YYYY format (e.g., "03/2024")
+ * date2 - Second date in MM/YYYY format (e.g., "04/2024")
+ * Returns True if date1 is less than or equal to date2, false otherwise.
+ * Throws Error if dates are not in valid MM/YYYY format.
+ */
+export function isMonthYearLessOrEqual(date1: string, date2: string): boolean {
+  const regex = /^(0?[1-9]|1[0-2])\/\d{4}$/;
+  if (!regex.test(date1) || !regex.test(date2)) {
+    throw new Error('Invalid date format. Expected format is MM/YYYY');
+  }
+  const [month1, year1] = date1.split('/').map(Number);
+  const [month2, year2] = date2.split('/').map(Number);
+  if (year1 !== year2) return year1 <= year2;
+  return month1 <= month2;
+}
+
+
+/**
  * When processing multiple CSV files, this function ensures that data is ordered based on process date.
  * This is crucial for maintaining the correct activity order across all input files.
  */
@@ -50,7 +69,7 @@ export function dateToMonthYear(dateString: string): string {
 export function getTradesByMonth(rows: HoodTradeTy [], month: string): HoodTradeTy [] {
   return rows.filter(row =>
     row.process_date &&
-    Number(row.process_date.split('/')[0]) <= Number(month));
+    isMonthYearLessOrEqual(dateToMonthYear(row.process_date), month));
 }
 
 
@@ -106,7 +125,7 @@ export function getOrderedHoodMonthsData(rows: HoodTradeTy []): HoodMonthData[] 
     const monthYear: string = dateToMonthYear(row.process_date);
     if (!monthYearData[monthYear]) {
       monthYearData[monthYear] = true;
-      data.push(new HoodMonthData(monthYear, getTradesByMonth(rows, monthYear.split('/')[0])));
+      data.push(new HoodMonthData(monthYear, getTradesByMonth(rows, monthYear)));
     }
   }
   return data.sort((a, b) => {

@@ -96,6 +96,7 @@ export class HoodMonthData implements HoodMonthData {
 
   printBuySellTxs(): void {
     const txs: HoodTradeTy[] = this.getBuySellTxs();
+    if (!txs.length) return;
     const headers = ['Trade Date', 'Symbol', 'Side', 'Qty', 'Price', 'Amount'];
     const headerRow = headers.map(header => header.padEnd(10)).join(' | ');
     const separator = headers.map(() => '----------').join('-|-');
@@ -114,6 +115,7 @@ export class HoodMonthData implements HoodMonthData {
       ].join(' | ');
       console.log(rowString);
     });
+    console.log('\n');
   }
 
   printHeadline(): void {

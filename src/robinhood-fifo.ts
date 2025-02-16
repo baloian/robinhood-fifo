@@ -41,7 +41,6 @@ export default class RobinhoodFIFO {
       this.reset();
       monthData.printHeadline();
       monthData.printBuySellTxs();
-      console.log('\n');
       monthData.printMetadata();
       this.processTrades(deepCopy(monthData.getData()));
       printHoldings(this.hoodQueue);
