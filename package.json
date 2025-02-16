@@ -1,6 +1,6 @@
 {
   "name": "robinhood-fifo",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Robinhood Trading Gain/Loss Calculator",
   "author": "Artiom Baloian <artiom.baloian@gmail.com>",
   "main": "dist/robinhood-fifo.js",
@@ -27,7 +27,7 @@
     "csv-parser": "^3.0.0",
     "fs": "^0.0.1-security",
     "ts-node": "^10.9.2",
-    "typescript-ds-lib": "^0.3.8"
+    "typescript-ds-lib": "^0.4.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
@@ -39,6 +39,6 @@
     "@typescript-eslint/parser": "^7.17.0",
     "eslint": "^8.57.0",
     "ts-jest": "^29.2.5",
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.3"
   }
 }
